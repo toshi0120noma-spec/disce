@@ -1,0 +1,208 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01//EN" "http://www.w3.org/TR/html4/strict.dtd">
+<html>
+<head>
+  <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+  <meta http-equiv="Content-Style-Type" content="text/css">
+  <title></title>
+  <meta name="Generator" content="Cocoa HTML Writer">
+  <meta name="CocoaVersion" content="2575.5">
+  <style type="text/css">
+    p.p1 {margin: 0.0px 0.0px 0.0px 0.0px; font: 12.0px Helvetica}
+    p.p2 {margin: 0.0px 0.0px 0.0px 0.0px; font: 12.0px Helvetica; min-height: 14.0px}
+  </style>
+</head>
+<body>
+<p class="p1">&lt;!doctype html&gt;</p>
+<p class="p1">&lt;html lang="ja"&gt;</p>
+<p class="p1">&lt;head&gt;</p>
+<p class="p1">&lt;meta charset="utf-8" /&gt;</p>
+<p class="p1">&lt;meta name="viewport" content="width=device-width,initial-scale=1" /&gt;</p>
+<p class="p1">&lt;title&gt;Dice Fortune | げーまー哲&lt;/title&gt;</p>
+<p class="p1">&lt;style&gt;</p>
+<p class="p1"><span class="Apple-converted-space">  </span>:root{</p>
+<p class="p1"><span class="Apple-converted-space">    </span>--accent:#24AAED;<span class="Apple-converted-space">                </span>/* STUDIOのブランド色に合わせて変更可 */</p>
+<p class="p1"><span class="Apple-converted-space">    </span>--bg:#ffffff;<span class="Apple-converted-space">                    </span>/* 背景色（透過させたい時は transparent も可）*/</p>
+<p class="p1"><span class="Apple-converted-space">    </span>--ink:#0a0a0a;</p>
+<p class="p1"><span class="Apple-converted-space">    </span>--soft:#f3f6f9;</p>
+<p class="p1"><span class="Apple-converted-space">    </span>--radius:18px;</p>
+<p class="p1"><span class="Apple-converted-space">    </span>--shadow:0 10px 30px rgba(0,0,0,.08);</p>
+<p class="p1"><span class="Apple-converted-space">  </span>}</p>
+<p class="p1"><span class="Apple-converted-space">  </span>html,body{height:100%;background:var(--bg);color:var(--ink);font-family:ui-sans-serif,system-ui,-apple-system,Segoe UI,Roboto,Helvetica,Arial,"Noto Sans JP","Hiragino Kaku Gothic ProN","Yu Gothic UI","Yu Gothic",Meiryo,sans-serif;}</p>
+<p class="p1"><span class="Apple-converted-space">  </span>.wrap{max-width:880px;margin:0 auto;padding:24px}</p>
+<p class="p1"><span class="Apple-converted-space">  </span>.card{background:#fff;border-radius:var(--radius);box-shadow:var(--shadow);padding:22px}</p>
+<p class="p1"><span class="Apple-converted-space">  </span>.head{display:flex;gap:12px;align-items:center;justify-content:space-between;flex-wrap:wrap;}</p>
+<p class="p1"><span class="Apple-converted-space">  </span>.title{font-weight:800;font-size:clamp(18px,3.2vw,22px);}</p>
+<p class="p1"><span class="Apple-converted-space">  </span>.sub{opacity:.7;font-size:13px}</p>
+<p class="p1"><span class="Apple-converted-space">  </span>.modes{display:flex;gap:8px;flex-wrap:wrap}</p>
+<p class="p1"><span class="Apple-converted-space">  </span>.chip{border:1px solid #e6e9ee;border-radius:999px;padding:8px 14px;background:#fff;cursor:pointer;font-weight:700;font-size:14px}</p>
+<p class="p1"><span class="Apple-converted-space">  </span>.chip[aria-pressed="true"]{background:var(--accent);color:#fff;border-color:var(--accent)}</p>
+<p class="p1"><span class="Apple-converted-space">  </span>.stage{margin:16px 0;border-radius:var(--radius);background:var(--soft);padding:22px;display:grid;grid-template-columns:1fr;gap:18px}</p>
+<p class="p1"><span class="Apple-converted-space">  </span>.die-area{display:grid;place-items:center;height:280px;position:relative;overflow:hidden;border-radius:14px;background:radial-gradient(1200px 400px at 50% 0%, rgba(36,170,237,.15), transparent)}</p>
+<p class="p1"><span class="Apple-converted-space">  </span>.die{width:168px;height:168px;border-radius:24px;display:grid;place-items:center;</p>
+<p class="p1"><span class="Apple-converted-space">       </span>background: radial-gradient(120px 120px at 30% 25%, rgba(255,255,255,.85), rgba(255,255,255,.35)) ,</p>
+<p class="p1"><span class="Apple-converted-space">                   </span>linear-gradient(160deg, rgba(255,255,255,.35), rgba(0,0,0,.12)),</p>
+<p class="p1"><span class="Apple-converted-space">                   </span>linear-gradient(180deg, var(--accent), #0681c9);</p>
+<p class="p1"><span class="Apple-converted-space">       </span>color:#fff; font-weight:900; font-size:64px; letter-spacing:.02em;</p>
+<p class="p1"><span class="Apple-converted-space">       </span>box-shadow: 0 18px 40px rgba(0,0,0,.18), inset 0 10px 22px rgba(255,255,255,.25), inset 0 -10px 18px rgba(0,0,0,.2);</p>
+<p class="p1"><span class="Apple-converted-space">       </span>transform:rotateX(12deg) rotateZ(-8deg);</p>
+<p class="p1"><span class="Apple-converted-space">  </span>}</p>
+<p class="p1"><span class="Apple-converted-space">  </span>.die.spin{animation:spin .8s cubic-bezier(.2,.7,.2,1)}</p>
+<p class="p1"><span class="Apple-converted-space">  </span>@keyframes spin{</p>
+<p class="p1"><span class="Apple-converted-space">    </span>0%{transform:rotateX(12deg) rotateZ(-8deg) scale(1)}</p>
+<p class="p1"><span class="Apple-converted-space">    </span>50%{transform:rotateX(360deg) rotateZ(352deg) scale(1.06)}</p>
+<p class="p1"><span class="Apple-converted-space">    </span>100%{transform:rotateX(12deg) rotateZ(-8deg) scale(1)}</p>
+<p class="p1"><span class="Apple-converted-space">  </span>}</p>
+<p class="p1"><span class="Apple-converted-space">  </span>.badge{position:absolute;top:14px;left:14px;background:#fff;border-radius:999px;padding:6px 10px;font-weight:800;font-size:12px;border:1px solid #e8edf3}</p>
+<p class="p1"><span class="Apple-converted-space">  </span>.result{display:grid;gap:6px}</p>
+<p class="p1"><span class="Apple-converted-space">  </span>.result h3{margin:0;font-size:clamp(18px,3.4vw,22px)}</p>
+<p class="p1"><span class="Apple-converted-space">  </span>.result p{margin:0;color:#444;line-height:1.8}</p>
+<p class="p1"><span class="Apple-converted-space">  </span>.actions{display:flex;gap:10px;flex-wrap:wrap}</p>
+<p class="p1"><span class="Apple-converted-space">  </span>.btn{border:none;border-radius:10px;padding:12px 18px;font-weight:800;cursor:pointer}</p>
+<p class="p1"><span class="Apple-converted-space">  </span>.btn.primary{background:var(--accent);color:#fff}</p>
+<p class="p1"><span class="Apple-converted-space">  </span>.btn.ghost{background:#fff;border:1px solid #e6e9ee}</p>
+<p class="p1"><span class="Apple-converted-space">  </span>.note{font-size:12px;opacity:.7;margin-top:6px}</p>
+<p class="p1"><span class="Apple-converted-space">  </span>.footer{margin-top:10px;font-size:12px;opacity:.7;text-align:right}</p>
+<p class="p1"><span class="Apple-converted-space">  </span>@media (min-width:760px){</p>
+<p class="p1"><span class="Apple-converted-space">    </span>.stage{grid-template-columns:1.1fr 1fr}</p>
+<p class="p1"><span class="Apple-converted-space">    </span>.die-area{height:320px}</p>
+<p class="p1"><span class="Apple-converted-space">    </span>.die{width:200px;height:200px;font-size:72px}</p>
+<p class="p1"><span class="Apple-converted-space">  </span>}</p>
+<p class="p1">&lt;/style&gt;</p>
+<p class="p1">&lt;/head&gt;</p>
+<p class="p1">&lt;body&gt;</p>
+<p class="p1"><span class="Apple-converted-space">  </span>&lt;div class="wrap"&gt;</p>
+<p class="p1"><span class="Apple-converted-space">    </span>&lt;div class="card"&gt;</p>
+<p class="p1"><span class="Apple-converted-space">      </span>&lt;div class="head"&gt;</p>
+<p class="p1"><span class="Apple-converted-space">        </span>&lt;div&gt;</p>
+<p class="p1"><span class="Apple-converted-space">          </span>&lt;div class="title"&gt;DICE FORTUNE / ダイスおみくじ&lt;/div&gt;</p>
+<p class="p1"><span class="Apple-converted-space">          </span>&lt;div class="sub"&gt;“音と物語を創る焼うどん系VTuber・げーまー哲”の遊べるコーナー&lt;/div&gt;</p>
+<p class="p1"><span class="Apple-converted-space">        </span>&lt;/div&gt;</p>
+<p class="p1"><span class="Apple-converted-space">        </span>&lt;div class="modes" role="group" aria-label="ダイスの種類"&gt;</p>
+<p class="p1"><span class="Apple-converted-space">          </span>&lt;button class="chip" data-sides="4"<span class="Apple-converted-space">  </span>aria-pressed="false"&gt;d4&lt;/button&gt;</p>
+<p class="p1"><span class="Apple-converted-space">          </span>&lt;button class="chip" data-sides="6"<span class="Apple-converted-space">  </span>aria-pressed="false"&gt;d6&lt;/button&gt;</p>
+<p class="p1"><span class="Apple-converted-space">          </span>&lt;button class="chip" data-sides="8"<span class="Apple-converted-space">  </span>aria-pressed="false"&gt;d8&lt;/button&gt;</p>
+<p class="p1"><span class="Apple-converted-space">          </span>&lt;button class="chip" data-sides="12" aria-pressed="false"&gt;d12&lt;/button&gt;</p>
+<p class="p1"><span class="Apple-converted-space">          </span>&lt;button class="chip" data-sides="20" aria-pressed="true"&gt;d20&lt;/button&gt;</p>
+<p class="p1"><span class="Apple-converted-space">        </span>&lt;/div&gt;</p>
+<p class="p1"><span class="Apple-converted-space">      </span>&lt;/div&gt;</p>
+<p class="p2"><br></p>
+<p class="p1"><span class="Apple-converted-space">      </span>&lt;div class="stage"&gt;</p>
+<p class="p1"><span class="Apple-converted-space">        </span>&lt;div class="die-area"&gt;</p>
+<p class="p1"><span class="Apple-converted-space">          </span>&lt;span class="badge" id="badge"&gt;d20&lt;/span&gt;</p>
+<p class="p1"><span class="Apple-converted-space">          </span>&lt;div class="die" id="die" aria-live="polite"&gt;—&lt;/div&gt;</p>
+<p class="p1"><span class="Apple-converted-space">        </span>&lt;/div&gt;</p>
+<p class="p1"><span class="Apple-converted-space">        </span>&lt;div class="result"&gt;</p>
+<p class="p1"><span class="Apple-converted-space">          </span>&lt;h3 id="headline"&gt;ダイスを振ってみよう！&lt;/h3&gt;</p>
+<p class="p1"><span class="Apple-converted-space">          </span>&lt;p id="desc"&gt;下のボタンを押すと、選んだダイスで結果が出ます。結果に合わせて“運勢コメント”も表示されます。&lt;/p&gt;</p>
+<p class="p1"><span class="Apple-converted-space">          </span>&lt;div class="actions"&gt;</p>
+<p class="p1"><span class="Apple-converted-space">            </span>&lt;button class="btn primary" id="rollBtn"&gt;ダイスを振る&lt;/button&gt;</p>
+<p class="p1"><span class="Apple-converted-space">            </span>&lt;button class="btn ghost" id="shareBtn" title="結果の共有リンクをコピー"&gt;結果リンクをコピー&lt;/button&gt;</p>
+<p class="p1"><span class="Apple-converted-space">          </span>&lt;/div&gt;</p>
+<p class="p1"><span class="Apple-converted-space">          </span>&lt;div class="note"&gt;※演出はおみくじ用の軽いアニメーションです。TRPGの公式ロールではありません。&lt;/div&gt;</p>
+<p class="p1"><span class="Apple-converted-space">        </span>&lt;/div&gt;</p>
+<p class="p1"><span class="Apple-converted-space">      </span>&lt;/div&gt;</p>
+<p class="p2"><br></p>
+<p class="p1"><span class="Apple-converted-space">      </span>&lt;div class="footer"&gt;© Gamer Tetsu&lt;/div&gt;</p>
+<p class="p1"><span class="Apple-converted-space">    </span>&lt;/div&gt;</p>
+<p class="p1"><span class="Apple-converted-space">  </span>&lt;/div&gt;</p>
+<p class="p2"><br></p>
+<p class="p1">&lt;script&gt;</p>
+<p class="p1"><span class="Apple-converted-space">  </span>// ===== テーマ色をURLパラメータから変更 ?accent=%23ff7a00 など =====</p>
+<p class="p1"><span class="Apple-converted-space">  </span>const params = new URLSearchParams(location.search);</p>
+<p class="p1"><span class="Apple-converted-space">  </span>if(params.get('accent')) document.documentElement.style.setProperty('--accent', params.get('accent'));</p>
+<p class="p2"><br></p>
+<p class="p1"><span class="Apple-converted-space">  </span>const chips = document.querySelectorAll('.chip');</p>
+<p class="p1"><span class="Apple-converted-space">  </span>const badge = document.getElementById('badge');</p>
+<p class="p1"><span class="Apple-converted-space">  </span>const dieEl = document.getElementById('die');</p>
+<p class="p1"><span class="Apple-converted-space">  </span>const headline = document.getElementById('headline');</p>
+<p class="p1"><span class="Apple-converted-space">  </span>const desc = document.getElementById('desc');</p>
+<p class="p1"><span class="Apple-converted-space">  </span>const rollBtn = document.getElementById('rollBtn');</p>
+<p class="p1"><span class="Apple-converted-space">  </span>const shareBtn = document.getElementById('shareBtn');</p>
+<p class="p2"><br></p>
+<p class="p1"><span class="Apple-converted-space">  </span>let sides = 20;</p>
+<p class="p2"><br></p>
+<p class="p1"><span class="Apple-converted-space">  </span>chips.forEach(ch =&gt; ch.addEventListener('click', () =&gt; {</p>
+<p class="p1"><span class="Apple-converted-space">    </span>chips.forEach(c =&gt; c.setAttribute('aria-pressed','false'));</p>
+<p class="p1"><span class="Apple-converted-space">    </span>ch.setAttribute('aria-pressed','true');</p>
+<p class="p1"><span class="Apple-converted-space">    </span>sides = Number(ch.dataset.sides);</p>
+<p class="p1"><span class="Apple-converted-space">    </span>badge.textContent = 'd' + sides;</p>
+<p class="p1"><span class="Apple-converted-space">    </span>dieEl.textContent = '—';</p>
+<p class="p1"><span class="Apple-converted-space">    </span>headline.textContent = 'ダイスを選びました：d' + sides;</p>
+<p class="p1"><span class="Apple-converted-space">    </span>desc.textContent = '「ダイスを振る」を押して結果を出しましょう。';</p>
+<p class="p1"><span class="Apple-converted-space">    </span>history.replaceState({},'',location.pathname + '?s=' + sides);</p>
+<p class="p1"><span class="Apple-converted-space">  </span>}));</p>
+<p class="p2"><br></p>
+<p class="p1"><span class="Apple-converted-space">  </span>const fortuneText = (n, s) =&gt; {</p>
+<p class="p1"><span class="Apple-converted-space">    </span>// d20：細かめ、それ以外：ざっくり</p>
+<p class="p1"><span class="Apple-converted-space">    </span>if (s === 20){</p>
+<p class="p1"><span class="Apple-converted-space">      </span>if (n === 20) return ['クリティカル！大吉','行動あるのみ。今日のあなたは主役。'];</p>
+<p class="p1"><span class="Apple-converted-space">      </span>if (n &gt;= 16) return ['大吉','流れが来てます。難しめクエストにも挑戦を。'];</p>
+<p class="p1"><span class="Apple-converted-space">      </span>if (n &gt;= 11) return ['中吉','堅実に。準備を整えれば勝率アップ。'];</p>
+<p class="p1"><span class="Apple-converted-space">      </span>if (n &gt;= 6)<span class="Apple-converted-space">  </span>return ['小吉','無理せず基礎を固める日。休憩も大事。'];</p>
+<p class="p1"><span class="Apple-converted-space">      </span>if (n === 1) return ['ファンブル…','急ぎは禁物。今日はセーブをこまめに。'];</p>
+<p class="p1"><span class="Apple-converted-space">      </span>return ['末吉','まずは手持ちのタスクからコツコツ。'];</p>
+<p class="p1"><span class="Apple-converted-space">    </span>} else {</p>
+<p class="p1"><span class="Apple-converted-space">      </span>const ratio = n / s;</p>
+<p class="p1"><span class="Apple-converted-space">      </span>if (ratio &gt; .9) return ['大吉','願ってた展開が来るかも。リアクションは早めに！'];</p>
+<p class="p1"><span class="Apple-converted-space">      </span>if (ratio &gt; .6) return ['中吉','良き兆し。調整力を大切に。'];</p>
+<p class="p1"><span class="Apple-converted-space">      </span>if (ratio &gt; .3) return ['小吉','焦らず、回数で当てに行こう。'];</p>
+<p class="p1"><span class="Apple-converted-space">      </span>return ['凶','今日は安全運転。無理な突撃は控えめに。'];</p>
+<p class="p1"><span class="Apple-converted-space">    </span>}</p>
+<p class="p1"><span class="Apple-converted-space">  </span>};</p>
+<p class="p2"><br></p>
+<p class="p1"><span class="Apple-converted-space">  </span>function roll(){</p>
+<p class="p1"><span class="Apple-converted-space">    </span>// 擬似的な連続乱数で“回ってる感”を演出</p>
+<p class="p1"><span class="Apple-converted-space">    </span>const spins = 18 + Math.floor(Math.random()*10);</p>
+<p class="p1"><span class="Apple-converted-space">    </span>let tick = 0;</p>
+<p class="p1"><span class="Apple-converted-space">    </span>dieEl.classList.remove('spin'); void dieEl.offsetWidth; dieEl.classList.add('spin');</p>
+<p class="p1"><span class="Apple-converted-space">    </span>const timer = setInterval(()=&gt;{</p>
+<p class="p1"><span class="Apple-converted-space">      </span>const r = 1 + Math.floor(Math.random()*sides);</p>
+<p class="p1"><span class="Apple-converted-space">      </span>dieEl.textContent = r;</p>
+<p class="p1"><span class="Apple-converted-space">      </span>if(++tick &gt;= spins){</p>
+<p class="p1"><span class="Apple-converted-space">        </span>clearInterval(timer);</p>
+<p class="p1"><span class="Apple-converted-space">        </span>const n = Number(dieEl.textContent);</p>
+<p class="p1"><span class="Apple-converted-space">        </span>const [h, d] = fortuneText(n, sides);</p>
+<p class="p1"><span class="Apple-converted-space">        </span>headline.textContent = `結果：${n}（d${sides})<span class="Apple-converted-space">  </span>—<span class="Apple-converted-space">  </span>${h}`;</p>
+<p class="p1"><span class="Apple-converted-space">        </span>desc.textContent = d;</p>
+<p class="p1"><span class="Apple-converted-space">        </span>// URLに結果を記録（共有しやすく）</p>
+<p class="p1"><span class="Apple-converted-space">        </span>const url = new URL(location.href);</p>
+<p class="p1"><span class="Apple-converted-space">        </span>url.searchParams.set('s', sides);</p>
+<p class="p1"><span class="Apple-converted-space">        </span>url.searchParams.set('r', n);</p>
+<p class="p1"><span class="Apple-converted-space">        </span>history.replaceState({},'',url);</p>
+<p class="p1"><span class="Apple-converted-space">      </span>}</p>
+<p class="p1"><span class="Apple-converted-space">    </span>}, 45);</p>
+<p class="p1"><span class="Apple-converted-space">  </span>}</p>
+<p class="p2"><br></p>
+<p class="p1"><span class="Apple-converted-space">  </span>// 共有リンク：クリップボードへ</p>
+<p class="p1"><span class="Apple-converted-space">  </span>function share(){</p>
+<p class="p1"><span class="Apple-converted-space">    </span>const ok = () =&gt; {</p>
+<p class="p1"><span class="Apple-converted-space">      </span>shareBtn.textContent = 'コピーしました！';</p>
+<p class="p1"><span class="Apple-converted-space">      </span>setTimeout(()=&gt; shareBtn.textContent='結果リンクをコピー', 1600);</p>
+<p class="p1"><span class="Apple-converted-space">    </span>}</p>
+<p class="p1"><span class="Apple-converted-space">    </span>navigator.clipboard?.writeText(location.href).then(ok, ok);</p>
+<p class="p1"><span class="Apple-converted-space">  </span>}</p>
+<p class="p2"><br></p>
+<p class="p1"><span class="Apple-converted-space">  </span>// 初期状態：URLパラメータから復元</p>
+<p class="p1"><span class="Apple-converted-space">  </span>(function initFromURL(){</p>
+<p class="p1"><span class="Apple-converted-space">    </span>const s = Number(params.get('s'));</p>
+<p class="p1"><span class="Apple-converted-space">    </span>const r = Number(params.get('r'));</p>
+<p class="p1"><span class="Apple-converted-space">    </span>if (s &amp;&amp; [4,6,8,12,20].includes(s)){</p>
+<p class="p1"><span class="Apple-converted-space">      </span>sides = s;</p>
+<p class="p1"><span class="Apple-converted-space">      </span>chips.forEach(c =&gt; c.setAttribute('aria-pressed', c.dataset.sides==s ? 'true' : 'false'));</p>
+<p class="p1"><span class="Apple-converted-space">      </span>badge.textContent = 'd' + s;</p>
+<p class="p1"><span class="Apple-converted-space">    </span>}</p>
+<p class="p1"><span class="Apple-converted-space">    </span>if (r &amp;&amp; r&gt;=1 &amp;&amp; r&lt;=sides){</p>
+<p class="p1"><span class="Apple-converted-space">      </span>dieEl.textContent = r;</p>
+<p class="p1"><span class="Apple-converted-space">      </span>const [h, d] = fortuneText(r, sides);</p>
+<p class="p1"><span class="Apple-converted-space">      </span>headline.textContent = `結果：${r}（d${sides})<span class="Apple-converted-space">  </span>—<span class="Apple-converted-space">  </span>${h}`;</p>
+<p class="p1"><span class="Apple-converted-space">      </span>desc.textContent = d;</p>
+<p class="p1"><span class="Apple-converted-space">    </span>}</p>
+<p class="p1"><span class="Apple-converted-space">  </span>})();</p>
+<p class="p2"><br></p>
+<p class="p1"><span class="Apple-converted-space">  </span>rollBtn.addEventListener('click', roll);</p>
+<p class="p1"><span class="Apple-converted-space">  </span>shareBtn.addEventListener('click', share);</p>
+<p class="p1">&lt;/script&gt;</p>
+<p class="p1">&lt;/body&gt;</p>
+<p class="p1">&lt;/html&gt;</p>
+</body>
+</html>
