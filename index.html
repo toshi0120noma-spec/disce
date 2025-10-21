@@ -6,99 +6,94 @@
 <title>Dice Fortune | げーまー哲</title>
 <style>
   :root{
-    --accent:#24AAED;                /* STUDIOのブランド色に合わせて変更可 */
-    --bg:#ffffff;                    /* 背景色（透過させたい時は transparent も可）*/
+    --accent:#24AAED; /* STUDIOのブランド色に合わせて変更可 */
+    --bg:#ffffff;
     --ink:#0a0a0a;
     --soft:#f3f6f9;
     --radius:18px;
     --shadow:0 10px 30px rgba(0,0,0,.08);
   }
 
-  html,body{height:100%;background:var(--bg);color:var(--ink);font-family:ui-sans-serif,system-ui,-apple-system,Segoe UI,Roboto,Helvetica,Arial,"Noto Sans JP","Hiragino Kaku Gothic ProN","Yu Gothic UI","Yu Gothic",Meiryo,sans-serif;}
+  html,body{height:100%;background:var(--bg);color:var(--ink);
+    font-family:ui-sans-serif,system-ui,-apple-system,Segoe UI,Roboto,Helvetica,Arial,"Noto Sans JP","Hiragino Kaku Gothic ProN","Yu Gothic UI","Yu Gothic",Meiryo,sans-serif;}
   .wrap{max-width:880px;margin:0 auto;padding:24px}
   .card{background:#fff;border-radius:var(--radius);box-shadow:var(--shadow);padding:22px}
-  .head{display:flex;gap:12px;align-items:center;justify-content:space-between;flex-wrap:wrap;}
-  .title{font-weight:800;font-size:clamp(18px,3.2vw,22px);}
-  .sub{opacity:.7;font-size:13px}
+
+  .head{display:grid;gap:12px}
+  .selector-title{
+    display:flex;align-items:center;justify-content:space-between;gap:12px;
+    font-weight:800;font-size:clamp(16px,2.6vw,18px);
+  }
+  .selector-title .arrow{opacity:.6}
+
   .modes{display:flex;gap:8px;flex-wrap:wrap}
-  .chip{border:1px solid #e6e9ee;border-radius:999px;padding:8px 14px;background:#fff;cursor:pointer;font-weight:700;font-size:14px}
+  .chip{
+    border:1px solid #e6e9ee;border-radius:999px;padding:8px 14px;background:#fff;
+    cursor:pointer;font-weight:700;font-size:14px
+  }
   .chip[aria-pressed="true"]{background:var(--accent);color:#fff;border-color:var(--accent)}
-  .stage{margin:16px 0;border-radius:var(--radius);background:var(--soft);padding:22px;display:grid;grid-template-columns:1fr;gap:18px}
-  .die-area{display:grid;place-items:center;height:280px;position:relative;overflow:hidden;border-radius:14px;background:radial-gradient(1200px 400px at 50% 0%, rgba(36,170,237,.15), transparent)}
+
+  .stage{margin:10px 0;border-radius:var(--radius);background:var(--soft);padding:22px;
+    display:grid;grid-template-columns:1fr;gap:18px}
+  @media (min-width:760px){ .stage{grid-template-columns:1.1fr 1fr} }
+
+  .die-area{display:grid;place-items:center;height:280px;position:relative;overflow:hidden;border-radius:14px;
+    background:radial-gradient(1200px 400px at 50% 0%, rgba(36,170,237,.15), transparent)}
+  @media (min-width:760px){ .die-area{height:320px} }
 
   /* 画像ダイス（PNG）を背景として表示 */
   .die{
-    width: min(42vw, 260px);
-    height: min(42vw, 260px);
-    background-size: contain;
-    background-repeat: no-repeat;
-    background-position: center;
-    will-change: transform, filter;
-    transform-style: preserve-3d;
-    filter: drop-shadow(0 14px 28px rgba(0,0,0,.18));
+    width:min(42vw,260px);height:min(42vw,260px);
+    background-size:contain;background-repeat:no-repeat;background-position:center;
+    will-change:transform,filter;transform-style:preserve-3d;
+    filter:drop-shadow(0 14px 28px rgba(0,0,0,.18));
   }
 
   /* 回転アニメ（5秒） */
-  .die.spin{
-    animation: spinY 5s cubic-bezier(.2,.7,.2,1);
-  }
+  .die.spin{ animation:spinY 5s cubic-bezier(.2,.7,.2,1); }
   @keyframes spinY{
-    0%   { transform: rotateX(10deg) rotateY(0deg)     scale(1);    filter: drop-shadow(0 8px 18px rgba(0,0,0,.14)); }
-    40%  { transform: rotateX(10deg) rotateY(1440deg)  scale(1.06); filter: drop-shadow(0 22px 38px rgba(0,0,0,.22)); }
-    100% { transform: rotateX(10deg) rotateY(2160deg)  scale(1);    filter: drop-shadow(0 14px 28px rgba(0,0,0,.18)); }
+    0%   { transform:rotateX(10deg) rotateY(0deg)     scale(1);    filter:drop-shadow(0 8px 18px rgba(0,0,0,.14)); }
+    40%  { transform:rotateX(10deg) rotateY(1440deg)  scale(1.06); filter:drop-shadow(0 22px 38px rgba(0,0,0,.22)); }
+    100% { transform:rotateX(10deg) rotateY(2160deg)  scale(1);    filter:drop-shadow(0 14px 28px rgba(0,0,0,.18)); }
   }
+  @media (prefers-reduced-motion:reduce){ .die.spin{ animation-duration:.4s; } }
+
+  .badge{position:absolute;top:14px;left:14px;background:#fff;border-radius:999px;padding:6px 10px;
+    font-weight:800;font-size:12px;border:1px solid #e8edf3}
 
   /* 停止時にダイス上へ大きな数字を重ねる */
   .die-num{
-    position:absolute; inset:0;
-    display:grid; place-items:center;
-    font-weight:900; letter-spacing:.02em;
-    font-size: clamp(56px, 11vw, 96px);
-    color:#fff;
-    text-shadow:
-      0 2px 6px rgba(0,0,0,.35),
-      0 0 1px rgba(0,0,0,.3);
-    opacity:0; transform: scale(.9);
-    transition: opacity .25s ease, transform .25s ease;
+    position:absolute;inset:0;display:grid;place-items:center;
+    font-weight:900;letter-spacing:.02em;
+    font-size:clamp(56px,11vw,96px);color:#fff;
+    text-shadow:0 2px 6px rgba(0,0,0,.35),0 0 1px rgba(0,0,0,.3);
+    opacity:0;transform:scale(.9);transition:opacity .25s ease, transform .25s ease;
     pointer-events:none;
   }
-  .die-num.show{ opacity:1; transform: scale(1); }
+  .die-num.show{opacity:1;transform:scale(1);}
 
-  /* 動きを減らす設定の人には短く */
-  @media (prefers-reduced-motion: reduce){
-    .die.spin{ animation-duration: .4s; }
-  }
-
-  .badge{position:absolute;top:14px;left:14px;background:#fff;border-radius:999px;padding:6px 10px;font-weight:800;font-size:12px;border:1px solid #e8edf3}
-  .result{display:grid;gap:6px}
-  .result h3{margin:0;font-size:clamp(18px,3.4vw,22px)}
-  .result p{margin:0;color:#444;line-height:1.8}
+  .result{display:grid;gap:10px}
+  .result .small{margin:0;opacity:.75;font-size:clamp(14px,2.6vw,16px)}
+  .result .big{margin:0;font-weight:900;font-size:clamp(20px,3.6vw,26px)}
   .actions{display:flex;gap:10px;flex-wrap:wrap}
   .btn{border:none;border-radius:10px;padding:12px 18px;font-weight:800;cursor:pointer}
   .btn.primary{background:var(--accent);color:#fff}
-  .btn.ghost{background:#fff;border:1px solid #e6e9ee}
-  .note{font-size:12px;opacity:.7;margin-top:6px}
-  .footer{margin-top:10px;font-size:12px;opacity:.7;text-align:right}
-  @media (min-width:760px){
-    .stage{grid-template-columns:1.1fr 1fr}
-    .die-area{height:320px}
-  }
 </style>
 </head>
 <body>
   <div class="wrap">
     <div class="card">
       <div class="head">
-        <div>
-          <div class="title">DICE FORTUNE / ダイスおみくじ</div>
-          <div class="sub">“音と物語を創る焼うどん系VTuber・げーまー哲”の遊べるコーナー</div>
+        <div class="selector-title">
+          <span>使用するダイスをセレクト</span>
+          <span class="arrow">▶︎</span>
         </div>
         <div class="modes" role="group" aria-label="ダイスの種類">
-          <button class="chip" data-sides="4"  aria-pressed="false">d4</button>
-          <button class="chip" data-sides="6"  aria-pressed="false">d6</button>
-          <button class="chip" data-sides="8"  aria-pressed="false">d8</button>
-          <button class="chip" data-sides="12" aria-pressed="false">d12</button>
-          <button class="chip" data-sides="20" aria-pressed="true">d20</button>
+          <button class="chip" data-sides="4"  aria-pressed="false">4面</button>
+          <button class="chip" data-sides="6"  aria-pressed="false">6面</button>
+          <button class="chip" data-sides="8"  aria-pressed="false">8面</button>
+          <button class="chip" data-sides="12" aria-pressed="false">12面</button>
+          <button class="chip" data-sides="20" aria-pressed="true">20面</button>
         </div>
       </div>
 
@@ -108,18 +103,15 @@
           <div class="die" id="die" aria-hidden="true"></div>
           <div class="die-num" id="dieNum" aria-live="polite"></div>
         </div>
+
         <div class="result">
-          <h3 id="headline">ダイスを振ってみよう！</h3>
-          <p id="desc">下のボタンを押すと、選んだダイスで結果が出ます。結果に合わせて“運勢コメント”も表示されます。</p>
+          <p class="small" id="headline">結果：—</p>
+          <p class="big"   id="fortuneLabel">今日の運勢：—</p>
           <div class="actions">
             <button class="btn primary" id="rollBtn">ダイスを振る</button>
-            <button class="btn ghost" id="shareBtn" title="結果の共有リンクをコピー">結果リンクをコピー</button>
           </div>
-          <div class="note">※演出はおみくじ用の軽いアニメーションです。TRPGの公式ロールではありません。</div>
         </div>
       </div>
-
-      <div class="footer">© Gamer Tetsu</div>
     </div>
   </div>
 
@@ -133,10 +125,9 @@
   const badge    = document.getElementById('badge');
   const dieEl    = document.getElementById('die');
   const dieNum   = document.getElementById('dieNum');
-  const headline = document.getElementById('headline');
-  const desc     = document.getElementById('desc');
+  const headline = document.getElementById('headline');      // 小さめ：結果：n
+  const fortuneLabel = document.getElementById('fortuneLabel'); // 大きめ：今日の運勢：○○
   const rollBtn  = document.getElementById('rollBtn');
-  const shareBtn = document.getElementById('shareBtn');
 
   // 画像の場所（img/ 配下にPNGを置く）
   const diceImages = {
@@ -146,8 +137,7 @@
     12: 'img/d12.png',
     20: 'img/d20.png'
   };
-
-  // プリロード（チラつき防止）
+  // プリロード
   Object.values(diceImages).forEach(src => { const i = new Image(); i.src = src; });
 
   // 初期値
@@ -156,9 +146,11 @@
   function updateDieImage(){
     dieEl.style.backgroundImage = `url(${diceImages[sides]})`;
     badge.textContent = 'd' + sides;
-    // 切替直後は数字を消す
     dieNum.classList.remove('show');
     dieNum.textContent = '';
+    headline.textContent = '結果：—';
+    fortuneLabel.textContent = '今日の運勢：—';
+    history.replaceState({},'',location.pathname + '?s=' + sides);
   }
 
   // ダイス種類の切り替え
@@ -167,59 +159,47 @@
     ch.setAttribute('aria-pressed','true');
     sides = Number(ch.dataset.sides);
     updateDieImage();
-    headline.textContent = 'ダイスを選びました：d' + sides;
-    desc.textContent = '「ダイスを振る」を押して結果を出しましょう。';
-    history.replaceState({},'',location.pathname + '?s=' + sides);
   }));
 
-  // おみくじメッセージ
-  const fortuneText = (n, s) => {
+  // 運勢テキスト（名称だけ返す）
+  const fortuneName = (n, s) => {
     if (s === 20){
-      if (n === 20) return ['クリティカル！大吉','行動あるのみ。今日のあなたは主役。'];
-      if (n >= 16) return ['大吉','流れが来てます。難しめクエストにも挑戦を。'];
-      if (n >= 11) return ['中吉','堅実に。準備を整えれば勝率アップ。'];
-      if (n >= 6)  return ['小吉','無理せず基礎を固める日。休憩も大事。'];
-      if (n === 1) return ['ファンブル…','急ぎは禁物。今日はセーブをこまめに。'];
-      return ['末吉','まずは手持ちのタスクからコツコツ。'];
+      if (n === 20) return 'クリティカル！大吉';
+      if (n >= 16) return '大吉';
+      if (n >= 11) return '中吉';
+      if (n >= 6)  return '小吉';
+      if (n === 1) return 'ファンブル…';
+      return '末吉';
     } else {
       const ratio = n / s;
-      if (ratio > .9) return ['大吉','願ってた展開が来るかも。リアクションは早めに！'];
-      if (ratio > .6) return ['中吉','良き兆し。調整力を大切に。'];
-      if (ratio > .3) return ['小吉','焦らず、回数で当てに行こう。'];
-      return ['凶','今日は安全運転。無理な突撃は控えめに。'];
+      if (ratio > .9) return '大吉';
+      if (ratio > .6) return '中吉';
+      if (ratio > .3) return '小吉';
+      return '凶';
     }
   };
 
   // 振る（回転5秒・停止時に数字を大きく表示）
   function roll(){
-    // 見た目の回転（5s）
     dieEl.classList.remove('spin'); void dieEl.offsetWidth; dieEl.classList.add('spin');
-    // 回転中は数字を隠す
-    dieNum.classList.remove('show');
-    dieNum.textContent = '';
+    dieNum.classList.remove('show'); dieNum.textContent = '';
+    headline.textContent = '結果：—';
 
     // 擬似連続乱数（だいたい 80回 × 60ms ≒ 4.8秒）
-    const spins = 80;
-    const interval = 60;
+    const spins = 80, interval = 60;
     let tick = 0;
 
     const timer = setInterval(()=>{
-      // 中間の内部乱数（演出用・画面表示は最後だけ）
-      const _r = 1 + Math.floor(Math.random()*sides);
       if(++tick >= spins){
         clearInterval(timer);
         // 最終確定
         const n = 1 + Math.floor(Math.random()*sides);
-        const [h, d] = fortuneText(n, sides);
-        headline.textContent = `結果：${n}（d${sides})  —  ${h}`;
-        desc.textContent = d;
+        headline.textContent = `結果：${n}`;
+        fortuneLabel.textContent = `今日の運勢：${fortuneName(n, sides)}`;
 
-        // ダイス上に大きく数字表示
         dieNum.textContent = n;
-        // 少し遅らせて見せると気持ちいい（回転終了と同期）
         setTimeout(()=> dieNum.classList.add('show'), 80);
 
-        // 共有URL更新
         const url = new URL(location.href);
         url.searchParams.set('s', sides);
         url.searchParams.set('r', n);
@@ -228,39 +208,21 @@
     }, interval);
   }
 
-  // 共有リンク
-  function share(){
-    const ok = () => {
-      shareBtn.textContent = 'コピーしました！';
-      setTimeout(()=> shareBtn.textContent='結果リンクをコピー', 1600);
-    }
-    navigator.clipboard?.writeText(location.href).then(ok, ok);
-  }
-
   // 初期状態：URLから復元
   (function initFromURL(){
     const s = Number(params.get('s'));
     const r = Number(params.get('r'));
-    if (s && [4,6,8,12,20].includes(s)){
-      sides = s;
-      chips.forEach(c => c.setAttribute('aria-pressed', c.dataset.sides==s ? 'true' : 'false'));
-    }
-    // 画像適用
+    if (s && [4,6,8,12,20].includes(s)){ sides = s; chips.forEach(c => c.setAttribute('aria-pressed', c.dataset.sides==s ? 'true' : 'false')); }
     dieEl.style.backgroundImage = `url(${(sides in diceImages)? diceImages[sides] : diceImages[20]})`;
     badge.textContent = 'd' + sides;
-
     if (r && r>=1 && r<=sides){
-      const [h, d] = fortuneText(r, sides);
-      headline.textContent = `結果：${r}（d${sides})  —  ${h}`;
-      desc.textContent = d;
-      // 前回の結果をダイス上に表示しておく
-      dieNum.textContent = r;
-      dieNum.classList.add('show');
+      headline.textContent = `結果：${r}`;
+      fortuneLabel.textContent = `今日の運勢：${fortuneName(r, sides)}`;
+      dieNum.textContent = r; dieNum.classList.add('show');
     }
   })();
 
   rollBtn.addEventListener('click', roll);
-  shareBtn.addEventListener('click', share);
 </script>
 </body>
 </html>
