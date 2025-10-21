@@ -26,7 +26,7 @@
   .stage{margin:16px 0;border-radius:var(--radius);background:var(--soft);padding:22px;display:grid;grid-template-columns:1fr;gap:18px}
   .die-area{display:grid;place-items:center;height:280px;position:relative;overflow:hidden;border-radius:14px;background:radial-gradient(1200px 400px at 50% 0%, rgba(36,170,237,.15), transparent)}
 
-  /* 画像でダイスを表示（背景画像） */
+  /* 画像ダイス（PNG）を背景として表示 */
   .die{
     width: min(42vw, 260px);
     height: min(42vw, 260px);
@@ -34,19 +34,25 @@
     background-repeat: no-repeat;
     background-position: center;
     will-change: transform, filter;
-    transition: transform .8s cubic-bezier(.2,.7,.2,1), filter .2s;
+    transition: transform 1.8s cubic-bezier(.2,.7,.2,1), filter .2s; /* デフォルトの遷移 */
     transform-style: preserve-3d;
     filter: drop-shadow(0 14px 28px rgba(0,0,0,.18));
   }
 
-  /* 回転アニメ（擬似3D） */
+  /* 回転アニメ（長め） */
   .die.spin{
-    animation: spinY .8s cubic-bezier(.2,.7,.2,1);
+    animation: spinY 1.8s cubic-bezier(.2,.7,.2,1);
   }
   @keyframes spinY{
-    0%   { transform: rotateX(8deg) rotateY(0deg) scale(1);   filter: drop-shadow(0 8px 18px rgba(0,0,0,.14)); }
-    50%  { transform: rotateX(8deg) rotateY(360deg) scale(1.06); filter: drop-shadow(0 20px 34px rgba(0,0,0,.22)); }
-    100% { transform: rotateX(8deg) rotateY(720deg) scale(1); }
+    0%   { transform: rotateX(10deg) rotateY(0deg)    scale(1);    filter: drop-shadow(0 8px 18px rgba(0,0,0,.14)); }
+    40%  { transform: rotateX(10deg) rotateY(720deg)  scale(1.06); filter: drop-shadow(0 22px 38px rgba(0,0,0,.22)); }
+    100% { transform: rotateX(10deg) rotateY(1440deg) scale(1);    filter: drop-shadow(0 14px 28px rgba(0,0,0,.18)); }
+  }
+
+  /* 動きを減らす設定の人には短く */
+  @media (prefers-reduced-motion: reduce){
+    .die{ transition-duration: .3s; }
+    .die.spin{ animation-duration: .3s; }
   }
 
   .badge{position:absolute;top:14px;left:14px;background:#fff;border-radius:999px;padding:6px 10px;font-weight:800;font-size:12px;border:1px solid #e8edf3}
@@ -116,7 +122,7 @@
   const rollBtn  = document.getElementById('rollBtn');
   const shareBtn = document.getElementById('shareBtn');
 
-  // 画像の場所を設定（必ず img/ にPNGを置いてください）
+  // 画像の場所（img/ 配下にPNGを置く）
   const diceImages = {
     4:  'img/d4.png',
     6:  'img/d6.png',
@@ -125,7 +131,7 @@
     20: 'img/d20.png'
   };
 
-  // 画像プリロード（チラつき防止）
+  // プリロード（チラつき防止）
   Object.values(diceImages).forEach(src => { const i = new Image(); i.src = src; });
 
   // 初期値
@@ -165,18 +171,23 @@
     }
   };
 
-  // 振る（画像は回転、数字はテキストで表示）
+  // 振る（長め版：1.8〜2.6秒想定）
   function roll(){
+    // 見た目の回転
     dieEl.classList.remove('spin'); void dieEl.offsetWidth; dieEl.classList.add('spin');
 
-    const spins = 18 + Math.floor(Math.random()*10);
-    let tick = 0, last = 1;
+    // 擬似連続乱数で“回ってる感”を長めに
+    const spins = 26 + Math.floor(Math.random()*18); // 26〜43回
+    const interval = 55; // ms（合計 ~1.43〜2.37秒）
+    let tick = 0;
 
     const timer = setInterval(()=>{
-      last = 1 + Math.floor(Math.random()*sides); // 中間演出で内部だけ更新
+      // 途中経過の内部乱数（画面には出さない／出したいならheadlineで一時表示も可）
+      const r = 1 + Math.floor(Math.random()*sides);
       if(++tick >= spins){
         clearInterval(timer);
-        const n = 1 + Math.floor(Math.random()*sides); // 最終確定
+        // 最終確定
+        const n = 1 + Math.floor(Math.random()*sides);
         const [h, d] = fortuneText(n, sides);
         headline.textContent = `結果：${n}（d${sides})  —  ${h}`;
         desc.textContent = d;
@@ -186,7 +197,7 @@
         url.searchParams.set('r', n);
         history.replaceState({},'',url);
       }
-    }, 45);
+    }, interval);
   }
 
   // 共有リンク
