@@ -9,8 +9,9 @@
     --accent:#24AAED; --ink:#0a0a0a; --bg:#ffffff; --soft:#f3f6f9;
     --radius:18px; --shadow:0 10px 30px rgba(0,0,0,.08);
     --btn-bg:#222; --btn-ink:#EADCC2;
-    --avatar:120px;           /* ← アイコンの一辺（固定） */
-    --gutter:16px;            /* テキストとアイコンの間隔 */
+    --avatar:120px;          /* アイコン一辺 */
+    --gutter:16px;           /* テキスト↔アイコン間 */
+    --overlap:8px;           /* ボタンの“食い込み”量 */
   }
   html,body{height:100%;background:var(--bg);color:var(--ink);
     font-family:ui-sans-serif,system-ui,-apple-system,Segoe UI,Roboto,Helvetica,Arial,"Noto Sans JP","Hiragino Kaku Gothic ProN","Yu Gothic UI","Yu Gothic",Meiryo,sans-serif;}
@@ -23,18 +24,16 @@
   }
   @media (min-width:760px){ .stage{grid-template-columns:1.1fr 1fr} }
 
-  /* ===== 左：ダイス領域（そのまま） ===== */
+  /* ===== 左：ダイス（既存のまま） ===== */
   .dice-area{
     display:grid;place-items:center;position:relative;border-radius:14px;
     background:radial-gradient(1200px 400px at 50% 0%, rgba(36,170,237,.12), transparent);
     padding:18px; min-height:340px; overflow:hidden;
   }
-
   .dice-grid{
     width:100%; display:grid; grid-template-columns:1fr 1fr;
     gap:min(5vw,20px); align-items:center; justify-items:center;
   }
-
   .die-wrap{position:relative; display:grid; place-items:center;}
   .die{
     width:min(32vw,180px); height:min(32vw,180px);
@@ -53,7 +52,6 @@
     .die.spin{animation-duration:.4s}
     .die.tilt-a,.die.tilt-b{transition-duration:.08s}
   }
-
   .die-num{
     position:absolute; inset:0; display:grid; place-items:center;
     font-weight:900; letter-spacing:.02em; font-size:clamp(38px,8.5vw,68px);
@@ -63,18 +61,27 @@
   }
   .die-num.show{opacity:1;transform:scale(1)}
 
-  /* ===== 右：結果（等高・ボトム固定・アイコン絶対配置） ===== */
+  /* ===== 右：結果（等高＋下固定。アイコン右下、ボタン重ね） ===== */
   .result{
     position:relative; border-radius:16px; overflow:hidden;
     background:
       linear-gradient(#fff,#fff) padding-box,
       linear-gradient(135deg, rgba(36,170,237,.28), rgba(36,170,237,0)) border-box;
     border:1px solid transparent;
-    /* アイコンスペース分の右パディングを常時確保 → アイコンは絶対配置してもレイアウトがズレない */
-    padding:18px calc(18px + var(--avatar) + var(--gutter)) 18px 18px;
+
+    /* 右下のアイコンとボタンを想定した余白計算
+       - 右は “アイコン幅 + gutter” を常時確保
+       - 下は ボタン高 + 余白 で切れないよう確保 */
+    --btn-h: 40px; --pad: 18px;
+    padding:
+      18px
+      calc(var(--pad) + var(--avatar) + var(--gutter))
+      calc(var(--pad) + var(--btn-h) + 12px)
+      18px;
+
     display:flex; flex-direction:column; height:100%;
+    box-sizing:border-box;
   }
-  /* 上部アクセントライン（装飾） */
   .result::before{
     content:""; position:absolute; left:14px; right:14px; top:10px; height:3px;
     border-radius:999px; background:linear-gradient(90deg, var(--accent), rgba(36,170,237,.15));
@@ -92,31 +99,36 @@
   .big{margin:2px 0 0;font-weight:900;font-size:clamp(20px,3.6vw,26px)}
   .comment{margin:8px 0 0;opacity:.95;font-size:clamp(13px,2.4vw,15px);line-height:1.8}
 
-  /* アクションを一番下に押し下げる */
   .spacer{flex:1}
-  .actions{display:flex;gap:10px;flex-wrap:wrap;margin-top:10px}
 
-  /* ボタン：常に同じサイズ（固定） */
+  .actions{
+    display:flex; gap:10px; flex-wrap:wrap; justify-content:flex-end;
+    position:relative; z-index:2;   /* ← アイコンより前面に */
+  }
   .btn{border:none;cursor:pointer;font-weight:800;display:inline-flex;align-items:center;gap:12px}
+  /* ボタン：固定サイズ＆“アイコン側へ8px食い込み” */
   .btn.primary{
     background:var(--btn-bg); color:var(--btn-ink);
     padding:10px 44px; border-radius:999px;
     font-size:clamp(14px,2.8vw,18px); letter-spacing:.02em;
-    line-height:1; min-height:40px; white-space:nowrap; min-width:220px;
+    line-height:1; min-height:var(--btn-h); white-space:nowrap; min-width:220px;
+    position:relative; transform:translateX(var(--overlap));
   }
   .btn.primary::before{content:"";width:10px;height:10px;border-radius:50%;background:var(--btn-ink);display:inline-block}
 
-  /* アイコン：右上に絶対配置（固定サイズでレイアウトシフト0） */
+  /* アイコン：右下固定。ボタンと“軽く重ねる” */
   .avatar{
-    position:absolute; top:18px; right:18px;
+    position:absolute; right:18px; bottom:calc(18px + var(--btn-h) - var(--overlap));
     width:var(--avatar); height:var(--avatar);
     border-radius:14px; background:linear-gradient(180deg, #f7fafc, #eef4f9);
     border:1px solid #e7edf4; box-shadow:var(--shadow);
-    overflow:hidden; display:grid; place-items:center;
+    overflow:hidden; display:grid; place-items:center; z-index:1;  /* ボタンの後ろ */
   }
   .avatar img{width:100%; height:100%; object-fit:cover; display:block;}
+
+  /* 狭い画面では重なりとアイコンサイズを少し弱める */
   @media (max-width:759px){
-    :root{ --avatar:96px; }
+    :root{ --avatar:96px; --overlap:4px; }
   }
 </style>
 </head>
@@ -140,7 +152,7 @@
 
         <!-- 右：結果 -->
         <div class="result">
-          <!-- 固定位置のアイコン（絶対配置） -->
+          <!-- 右下固定のアイコン（振る前後で位置は1mmも動かない） -->
           <div class="avatar"><img id="moodIcon" src="icons/mood_calm.png" alt="mood icon" decoding="async" /></div>
 
           <p class="crit" id="critBanner" style="display:none;"></p>
@@ -161,11 +173,11 @@
   <audio id="sfx" src="sound/dice.mp3" preload="auto"></audio>
 
 <script>
-  // ===== 画像パス =====
+  /* 画像パス */
   const diceImages = { A:'img/d20_a.png', B:'img/d20_b.png' };
   const moodByTier = {
-    super:    'icons/mood_super.png',   // 20&20（スーパークリティカル）
-    critical: 'icons/mood_crit.png',    // ゾロ目（クリティカル）
+    super:    'icons/mood_super.png',
+    critical: 'icons/mood_crit.png',
     '超大吉': 'icons/mood_super.png',
     '大吉':   'icons/mood_crit.png',
     '吉':     'icons/mood_good.png',
@@ -176,7 +188,7 @@
     '大凶':   'icons/mood_bad.png'
   };
 
-  // 要素
+  /* 要素 */
   const dieA = document.getElementById('dieA');
   const dieB = document.getElementById('dieB');
   const numA = document.getElementById('numA');
@@ -189,14 +201,13 @@
   const rollBtn = document.getElementById('rollBtn');
   const sfx = document.getElementById('sfx');
 
-  // プリロード
+  /* プリロード */
   [diceImages.A, diceImages.B, ...new Set(Object.values(moodByTier))].forEach(src=>{ const i=new Image(); i.src=src; });
   dieA.style.backgroundImage = `url(${diceImages.A})`;
   dieB.style.backgroundImage = `url(${diceImages.B})`;
 
   let endTimer = null;
 
-  // コメント
   const fortunes = {
     "超大吉": ["今日はすべてが味方です。肩の力を抜いて、そのまま進みましょう。", "がんばってきたことが、静かに花ひらく日。自分を信じて大丈夫。", "小さな喜びが重なって、心がふわっと軽くなりそう。"],
     "大吉":   ["いい風が吹いています。素直な一歩が、思わぬ実りに。", "あなたの魅力が伝わる日。やさしい言葉から始めてみて。", "気持ちの余裕が、素敵なご縁を呼び込みます。"],
@@ -208,7 +219,6 @@
     "大凶":   ["立ち止まる勇気が、あなたを守ってくれます。", "いまは温めるとき。整えてからで間に合います。", "大切なものほど、ゆっくりと育ちます。"]
   };
 
-  // 判定
   function fortuneFromPair(a,b){
     if (a===20 && b===20) return ['スーパークリティカル・超大吉','超大吉','super'];
     if (a===b)            return ['クリティカル・大吉','大吉','critical'];
@@ -228,19 +238,16 @@
 
   function showCriticalBanner(kind){
     if (!kind){ critBanner.style.display='none'; critBanner.textContent=''; return; }
-    if (kind==='super'){
-      critBanner.innerHTML = `✦<span style="opacity:.7">✧</span> <strong>スーパークリティカル！！</strong> <span style="opacity:.7">✧</span>✦`;
-    } else {
-      critBanner.innerHTML = `✦ <strong>クリティカル！</strong> ✦`;
-    }
+    critBanner.innerHTML = (kind==='super')
+      ? `✦<span style="opacity:.7">✧</span> <strong>スーパークリティカル！！</strong> <span style="opacity:.7">✧</span>✦`
+      : `✦ <strong>クリティカル！</strong> ✦`;
     critBanner.style.display='block';
   }
 
   function setMoodIcon(tier, kind){
     const key = kind ? kind : tier;
     const src = moodByTier[key] || 'icons/mood_calm.png';
-    // 固定サイズの枠に対して src だけ差し替える（位置・サイズは不変）
-    moodIcon.src = src;
+    moodIcon.src = src; /* 位置・サイズ不変、srcのみ差し替え */
   }
 
   function roll(){
