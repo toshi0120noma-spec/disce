@@ -34,25 +34,39 @@
     background-repeat: no-repeat;
     background-position: center;
     will-change: transform, filter;
-    transition: transform 1.8s cubic-bezier(.2,.7,.2,1), filter .2s; /* デフォルトの遷移 */
     transform-style: preserve-3d;
     filter: drop-shadow(0 14px 28px rgba(0,0,0,.18));
   }
 
-  /* 回転アニメ（長め） */
+  /* 回転アニメ（5秒） */
   .die.spin{
-    animation: spinY 1.8s cubic-bezier(.2,.7,.2,1);
+    animation: spinY 5s cubic-bezier(.2,.7,.2,1);
   }
   @keyframes spinY{
-    0%   { transform: rotateX(10deg) rotateY(0deg)    scale(1);    filter: drop-shadow(0 8px 18px rgba(0,0,0,.14)); }
-    40%  { transform: rotateX(10deg) rotateY(720deg)  scale(1.06); filter: drop-shadow(0 22px 38px rgba(0,0,0,.22)); }
-    100% { transform: rotateX(10deg) rotateY(1440deg) scale(1);    filter: drop-shadow(0 14px 28px rgba(0,0,0,.18)); }
+    0%   { transform: rotateX(10deg) rotateY(0deg)     scale(1);    filter: drop-shadow(0 8px 18px rgba(0,0,0,.14)); }
+    40%  { transform: rotateX(10deg) rotateY(1440deg)  scale(1.06); filter: drop-shadow(0 22px 38px rgba(0,0,0,.22)); }
+    100% { transform: rotateX(10deg) rotateY(2160deg)  scale(1);    filter: drop-shadow(0 14px 28px rgba(0,0,0,.18)); }
   }
+
+  /* 停止時にダイス上へ大きな数字を重ねる */
+  .die-num{
+    position:absolute; inset:0;
+    display:grid; place-items:center;
+    font-weight:900; letter-spacing:.02em;
+    font-size: clamp(56px, 11vw, 96px);
+    color:#fff;
+    text-shadow:
+      0 2px 6px rgba(0,0,0,.35),
+      0 0 1px rgba(0,0,0,.3);
+    opacity:0; transform: scale(.9);
+    transition: opacity .25s ease, transform .25s ease;
+    pointer-events:none;
+  }
+  .die-num.show{ opacity:1; transform: scale(1); }
 
   /* 動きを減らす設定の人には短く */
   @media (prefers-reduced-motion: reduce){
-    .die{ transition-duration: .3s; }
-    .die.spin{ animation-duration: .3s; }
+    .die.spin{ animation-duration: .4s; }
   }
 
   .badge{position:absolute;top:14px;left:14px;background:#fff;border-radius:999px;padding:6px 10px;font-weight:800;font-size:12px;border:1px solid #e8edf3}
@@ -91,7 +105,8 @@
       <div class="stage">
         <div class="die-area">
           <span class="badge" id="badge">d20</span>
-          <div class="die" id="die" aria-live="polite"></div>
+          <div class="die" id="die" aria-hidden="true"></div>
+          <div class="die-num" id="dieNum" aria-live="polite"></div>
         </div>
         <div class="result">
           <h3 id="headline">ダイスを振ってみよう！</h3>
@@ -117,6 +132,7 @@
   const chips    = document.querySelectorAll('.chip');
   const badge    = document.getElementById('badge');
   const dieEl    = document.getElementById('die');
+  const dieNum   = document.getElementById('dieNum');
   const headline = document.getElementById('headline');
   const desc     = document.getElementById('desc');
   const rollBtn  = document.getElementById('rollBtn');
@@ -140,6 +156,9 @@
   function updateDieImage(){
     dieEl.style.backgroundImage = `url(${diceImages[sides]})`;
     badge.textContent = 'd' + sides;
+    // 切替直後は数字を消す
+    dieNum.classList.remove('show');
+    dieNum.textContent = '';
   }
 
   // ダイス種類の切り替え
@@ -171,19 +190,22 @@
     }
   };
 
-  // 振る（長め版：1.8〜2.6秒想定）
+  // 振る（回転5秒・停止時に数字を大きく表示）
   function roll(){
-    // 見た目の回転
+    // 見た目の回転（5s）
     dieEl.classList.remove('spin'); void dieEl.offsetWidth; dieEl.classList.add('spin');
+    // 回転中は数字を隠す
+    dieNum.classList.remove('show');
+    dieNum.textContent = '';
 
-    // 擬似連続乱数で“回ってる感”を長めに
-    const spins = 26 + Math.floor(Math.random()*18); // 26〜43回
-    const interval = 55; // ms（合計 ~1.43〜2.37秒）
+    // 擬似連続乱数（だいたい 80回 × 60ms ≒ 4.8秒）
+    const spins = 80;
+    const interval = 60;
     let tick = 0;
 
     const timer = setInterval(()=>{
-      // 途中経過の内部乱数（画面には出さない／出したいならheadlineで一時表示も可）
-      const r = 1 + Math.floor(Math.random()*sides);
+      // 中間の内部乱数（演出用・画面表示は最後だけ）
+      const _r = 1 + Math.floor(Math.random()*sides);
       if(++tick >= spins){
         clearInterval(timer);
         // 最終確定
@@ -192,6 +214,12 @@
         headline.textContent = `結果：${n}（d${sides})  —  ${h}`;
         desc.textContent = d;
 
+        // ダイス上に大きく数字表示
+        dieNum.textContent = n;
+        // 少し遅らせて見せると気持ちいい（回転終了と同期）
+        setTimeout(()=> dieNum.classList.add('show'), 80);
+
+        // 共有URL更新
         const url = new URL(location.href);
         url.searchParams.set('s', sides);
         url.searchParams.set('r', n);
@@ -217,11 +245,17 @@
       sides = s;
       chips.forEach(c => c.setAttribute('aria-pressed', c.dataset.sides==s ? 'true' : 'false'));
     }
-    updateDieImage();
+    // 画像適用
+    dieEl.style.backgroundImage = `url(${(sides in diceImages)? diceImages[sides] : diceImages[20]})`;
+    badge.textContent = 'd' + sides;
+
     if (r && r>=1 && r<=sides){
       const [h, d] = fortuneText(r, sides);
       headline.textContent = `結果：${r}（d${sides})  —  ${h}`;
       desc.textContent = d;
+      // 前回の結果をダイス上に表示しておく
+      dieNum.textContent = r;
+      dieNum.classList.add('show');
     }
   })();
 
