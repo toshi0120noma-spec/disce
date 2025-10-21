@@ -9,29 +9,30 @@
     --accent:#24AAED; --ink:#0a0a0a; --bg:#ffffff; --soft:#f3f6f9;
     --radius:18px; --shadow:0 10px 30px rgba(0,0,0,.08);
     --btn-bg:#222; --btn-ink:#EADCC2;
+    --avatar:120px;           /* ← アイコンの一辺（固定） */
+    --gutter:16px;            /* テキストとアイコンの間隔 */
   }
   html,body{height:100%;background:var(--bg);color:var(--ink);
     font-family:ui-sans-serif,system-ui,-apple-system,Segoe UI,Roboto,Helvetica,Arial,"Noto Sans JP","Hiragino Kaku Gothic ProN","Yu Gothic UI","Yu Gothic",Meiryo,sans-serif;}
   .wrap{max-width:880px;margin:0 auto;padding:24px}
   .card{background:#fff;border-radius:var(--radius);box-shadow:var(--shadow);padding:22px}
 
-  .stage{margin:4px 0;border-radius:var(--radius);background:var(--soft);padding:22px;display:grid;grid-template-columns:1fr;gap:18px}
+  .stage{
+    margin:4px 0;border-radius:var(--radius);background:var(--soft);padding:22px;
+    display:grid;grid-template-columns:1fr;gap:18px;align-items:stretch;
+  }
   @media (min-width:760px){ .stage{grid-template-columns:1.1fr 1fr} }
 
   /* ===== 左：ダイス領域（そのまま） ===== */
   .dice-area{
     display:grid;place-items:center;position:relative;border-radius:14px;
     background:radial-gradient(1200px 400px at 50% 0%, rgba(36,170,237,.12), transparent);
-    padding:18px; min-height:300px; overflow:hidden;
+    padding:18px; min-height:340px; overflow:hidden;
   }
-  @media (min-width:760px){ .dice-area{min-height:340px} }
 
   .dice-grid{
-    width:100%;
-    display:grid;
-    grid-template-columns:1fr 1fr;
-    gap:min(5vw,20px);
-    align-items:center; justify-items:center;
+    width:100%; display:grid; grid-template-columns:1fr 1fr;
+    gap:min(5vw,20px); align-items:center; justify-items:center;
   }
 
   .die-wrap{position:relative; display:grid; place-items:center;}
@@ -41,12 +42,10 @@
     will-change:transform,filter; transform-style:preserve-3d;
     filter:drop-shadow(0 14px 28px rgba(0,0,0,.18));
   }
-
-  /* 単発回転（再加速なし） */
   .die.spin{animation:spinY 2.2s cubic-bezier(.05,.65,.25,1) forwards;}
   @keyframes spinY{
-    0%  {transform:rotateX(10deg) rotateY(0deg) scale(1);    filter:drop-shadow(0 8px 18px rgba(0,0,0,.14));}
-    100%{transform:rotateX(10deg) rotateY(1440deg) scale(1); filter:drop-shadow(0 14px 28px rgba(0,0,0,.18));}
+    0%  {transform:rotateX(10deg) rotateY(0deg); filter:drop-shadow(0 8px 18px rgba(0,0,0,.14));}
+    100%{transform:rotateX(10deg) rotateY(1440deg); filter:drop-shadow(0 14px 28px rgba(0,0,0,.18));}
   }
   .die.tilt-a{transition:transform .18s ease;transform:rotateX(14deg) rotateZ(-6deg)}
   .die.tilt-b{transition:transform .18s ease;transform:rotateX(12deg) rotateZ(5deg)}
@@ -55,87 +54,70 @@
     .die.tilt-a,.die.tilt-b{transition-duration:.08s}
   }
 
-  /* 各ダイス中央の数字 */
   .die-num{
-    position:absolute; inset:0;
-    display:grid; place-items:center;
-    font-weight:900; letter-spacing:.02em;
-    font-size:clamp(38px,8.5vw,68px);
+    position:absolute; inset:0; display:grid; place-items:center;
+    font-weight:900; letter-spacing:.02em; font-size:clamp(38px,8.5vw,68px);
     color:#fff; text-shadow:0 2px 6px rgba(0,0,0,.35),0 0 1px rgba(0,0,0,.3);
-    opacity:0; transform:scale(.9);
-    transition:opacity .25s ease,transform .25s ease;
+    opacity:0; transform:scale(.9); transition:opacity .25s ease,transform .25s ease;
     pointer-events:none;
   }
   .die-num.show{opacity:1;transform:scale(1)}
 
-  /* ===== 右：結果エリア（オシャレ化＋アイコンレイアウト） ===== */
+  /* ===== 右：結果（等高・ボトム固定・アイコン絶対配置） ===== */
   .result{
-    position:relative;
+    position:relative; border-radius:16px; overflow:hidden;
     background:
       linear-gradient(#fff,#fff) padding-box,
       linear-gradient(135deg, rgba(36,170,237,.28), rgba(36,170,237,0)) border-box;
-    border:1px solid transparent; border-radius:16px;
-    padding:18px;
+    border:1px solid transparent;
+    /* アイコンスペース分の右パディングを常時確保 → アイコンは絶対配置してもレイアウトがズレない */
+    padding:18px calc(18px + var(--avatar) + var(--gutter)) 18px 18px;
+    display:flex; flex-direction:column; height:100%;
   }
-  /* 上部に細いアクセントライン */
+  /* 上部アクセントライン（装飾） */
   .result::before{
     content:""; position:absolute; left:14px; right:14px; top:10px; height:3px;
     border-radius:999px; background:linear-gradient(90deg, var(--accent), rgba(36,170,237,.15));
-    opacity:.85;
+    opacity:.85; pointer-events:none;
   }
 
-  /* 中身を2カラム化：テキスト＋正方形アイコン */
-  .result-grid{
-    display:grid; gap:12px;
-    grid-template-columns: 1fr 120px; align-items:center;
-  }
-  @media (max-width:759px){
-    .result-grid{ grid-template-columns:1fr; }
-  }
-
-  /* クリティカル演出（運勢の“上”） */
   .crit{
-    margin:6px 0 2px; font-weight:900; letter-spacing:.06em;
+    margin:6px 0 4px; font-weight:900; letter-spacing:.06em;
     font-size:clamp(16px,3.2vw,20px);
     background:linear-gradient(90deg, #111, #3a3a3a);
     -webkit-background-clip:text; background-clip:text; color:transparent;
     text-shadow:0 1px 0 rgba(0,0,0,.06);
   }
-  .crit .spark{margin:0 .25em; opacity:.7}
-
-  .label{margin:0;opacity:.75;font-size:clamp(13px,2.6vw,15px)}
-  .big{margin:2px 0 0;font-weight:900;font-size:clamp(20px,3.6vw,26px)}
   .sum{margin:0;opacity:.9;font-size:clamp(16px,3vw,18px);font-weight:800}
-  .comment{margin:6px 0 0;opacity:.95;font-size:clamp(13px,2.4vw,15px);line-height:1.8}
+  .big{margin:2px 0 0;font-weight:900;font-size:clamp(20px,3.6vw,26px)}
+  .comment{margin:8px 0 0;opacity:.95;font-size:clamp(13px,2.4vw,15px);line-height:1.8}
 
-  /* 正方形アイコン（表情） */
-  .avatar{
-    justify-self:end;
-    width:120px; aspect-ratio:1/1; border-radius:14px;
-    background:linear-gradient(180deg, #f7fafc, #eef4f9);
-    border:1px solid #e7edf4; box-shadow:var(--shadow);
-    display:grid; place-items:center; overflow:hidden;
-  }
-  .avatar img{
-    width:100%; height:100%; object-fit:cover; display:block;
-  }
-  @media (max-width:759px){
-    .avatar{ justify-self:start; }
-  }
-
+  /* アクションを一番下に押し下げる */
+  .spacer{flex:1}
   .actions{display:flex;gap:10px;flex-wrap:wrap;margin-top:10px}
 
-  /* ボタン：常に同じサイズ（クリティカル時のサイズに固定） */
+  /* ボタン：常に同じサイズ（固定） */
   .btn{border:none;cursor:pointer;font-weight:800;display:inline-flex;align-items:center;gap:12px}
   .btn.primary{
     background:var(--btn-bg); color:var(--btn-ink);
     padding:10px 44px; border-radius:999px;
     font-size:clamp(14px,2.8vw,18px); letter-spacing:.02em;
-    line-height:1; min-height:40px;
-    white-space:nowrap;            /* 文字折返しで幅が変わらない */
-    min-width:220px;               /* ← 固定の底上げ（お好みで調整可） */
+    line-height:1; min-height:40px; white-space:nowrap; min-width:220px;
   }
   .btn.primary::before{content:"";width:10px;height:10px;border-radius:50%;background:var(--btn-ink);display:inline-block}
+
+  /* アイコン：右上に絶対配置（固定サイズでレイアウトシフト0） */
+  .avatar{
+    position:absolute; top:18px; right:18px;
+    width:var(--avatar); height:var(--avatar);
+    border-radius:14px; background:linear-gradient(180deg, #f7fafc, #eef4f9);
+    border:1px solid #e7edf4; box-shadow:var(--shadow);
+    overflow:hidden; display:grid; place-items:center;
+  }
+  .avatar img{width:100%; height:100%; object-fit:cover; display:block;}
+  @media (max-width:759px){
+    :root{ --avatar:96px; }
+  }
 </style>
 </head>
 <body>
@@ -156,22 +138,20 @@
           </div>
         </div>
 
-        <!-- 右：結果＋アイコン -->
+        <!-- 右：結果 -->
         <div class="result">
-          <div class="result-grid">
-            <div class="result-text">
-              <p class="crit" id="critBanner" style="display:none;"></p>
-              <p class="sum" id="sumLabel">合計：—</p>
-              <p class="big" id="fortuneLabel">今日の運勢：—</p>
-              <p class="comment" id="fortuneComment"></p>
-              <div class="actions">
-                <button class="btn primary" id="rollBtn">ダイスを振る</button>
-              </div>
-            </div>
+          <!-- 固定位置のアイコン（絶対配置） -->
+          <div class="avatar"><img id="moodIcon" src="icons/mood_calm.png" alt="mood icon" decoding="async" /></div>
 
-            <div class="avatar">
-              <img id="moodIcon" src="icons/mood_calm.png" alt="mood icon" />
-            </div>
+          <p class="crit" id="critBanner" style="display:none;"></p>
+          <p class="sum" id="sumLabel">合計：—</p>
+          <p class="big" id="fortuneLabel">今日の運勢：—</p>
+          <p class="comment" id="fortuneComment"></p>
+
+          <div class="spacer"></div>
+
+          <div class="actions">
+            <button class="btn primary" id="rollBtn">ダイスを振る</button>
           </div>
         </div>
       </div>
@@ -209,14 +189,14 @@
   const rollBtn = document.getElementById('rollBtn');
   const sfx = document.getElementById('sfx');
 
-  // 画像プリロード
+  // プリロード
   [diceImages.A, diceImages.B, ...new Set(Object.values(moodByTier))].forEach(src=>{ const i=new Image(); i.src=src; });
   dieA.style.backgroundImage = `url(${diceImages.A})`;
   dieB.style.backgroundImage = `url(${diceImages.B})`;
 
   let endTimer = null;
 
-  // 優しい女性トーンのコメント
+  // コメント
   const fortunes = {
     "超大吉": ["今日はすべてが味方です。肩の力を抜いて、そのまま進みましょう。", "がんばってきたことが、静かに花ひらく日。自分を信じて大丈夫。", "小さな喜びが重なって、心がふわっと軽くなりそう。"],
     "大吉":   ["いい風が吹いています。素直な一歩が、思わぬ実りに。", "あなたの魅力が伝わる日。やさしい言葉から始めてみて。", "気持ちの余裕が、素敵なご縁を呼び込みます。"],
@@ -228,7 +208,7 @@
     "大凶":   ["立ち止まる勇気が、あなたを守ってくれます。", "いまは温めるとき。整えてからで間に合います。", "大切なものほど、ゆっくりと育ちます。"]
   };
 
-  // 判定（クリティカル種別も返す）
+  // 判定
   function fortuneFromPair(a,b){
     if (a===20 && b===20) return ['スーパークリティカル・超大吉','超大吉','super'];
     if (a===b)            return ['クリティカル・大吉','大吉','critical'];
@@ -249,7 +229,7 @@
   function showCriticalBanner(kind){
     if (!kind){ critBanner.style.display='none'; critBanner.textContent=''; return; }
     if (kind==='super'){
-      critBanner.innerHTML = `✦<span class="spark">✧</span> <strong>スーパークリティカル！！</strong> <span class="spark">✧</span>✦`;
+      critBanner.innerHTML = `✦<span style="opacity:.7">✧</span> <strong>スーパークリティカル！！</strong> <span style="opacity:.7">✧</span>✦`;
     } else {
       critBanner.innerHTML = `✦ <strong>クリティカル！</strong> ✦`;
     }
@@ -259,6 +239,7 @@
   function setMoodIcon(tier, kind){
     const key = kind ? kind : tier;
     const src = moodByTier[key] || 'icons/mood_calm.png';
+    // 固定サイズの枠に対して src だけ差し替える（位置・サイズは不変）
     moodIcon.src = src;
   }
 
@@ -283,27 +264,19 @@
       const sum=a+b;
       const [display,tier,critKind]=fortuneFromPair(a,b);
 
-      if (a===b){
-        sumLabel.textContent=`合計：${sum}（${a}のゾロ目）`;
-      } else {
-        sumLabel.textContent=`合計：${sum}`;
-      }
-
+      sumLabel.textContent = (a===b) ? `合計：${sum}（${a}のゾロ目）` : `合計：${sum}`;
       showCriticalBanner(critKind);
       fortuneLabel.textContent=`今日の運勢：${display}`;
       const pool = fortunes[tier] || [];
       fortuneComment.textContent = pool.length ? pool[Math.floor(Math.random()*pool.length)] : '';
 
-      // 表情アイコン更新
       setMoodIcon(tier, critKind);
 
-      // 数字表示
       setTimeout(()=>{
         numA.textContent=a; numA.classList.add('show');
         numB.textContent=b; numB.classList.add('show');
       },140);
 
-      // 共有用
       const url=new URL(location.href);
       url.searchParams.set('r1',a); url.searchParams.set('r2',b);
       history.replaceState({},'',url);
@@ -312,25 +285,23 @@
     },ROLL_MS);
   }
 
-  // 復元
   (function initFromURL(){
     const p=new URLSearchParams(location.search);
     const r1=Number(p.get('r1')), r2=Number(p.get('r2'));
     if (r1>=1&&r1<=20&&r2>=1&&r2<=20){
       const [display,tier,critKind]=fortuneFromPair(r1,r2);
       const sum=r1+r2;
-      if (r1===r2){ sumLabel.textContent=`合計：${sum}（${r1}のゾロ目）`; }
-      else{ sumLabel.textContent=`合計：${sum}`; }
+      sumLabel.textContent = (r1===r2) ? `合計：${sum}（${r1}のゾロ目）` : `合計：${sum}`;
       showCriticalBanner(critKind);
+      fortuneLabel.textContent=`今日の運勢：${display}`;
       const pool = fortunes[tier] || [];
       fortuneComment.textContent = pool.length ? pool[Math.floor(Math.random()*pool.length)] : '';
-      fortuneLabel.textContent=`今日の運勢：${display}`;
       setMoodIcon(tier, critKind);
 
       numA.textContent=r1; numB.textContent=r2; numA.classList.add('show'); numB.classList.add('show');
       dieA.classList.add('tilt-a'); dieB.classList.add('tilt-b');
     } else {
-      setMoodIcon('小吉', null); // 初期表情（おだやか）
+      setMoodIcon('小吉', null);
     }
   })();
 
@@ -338,6 +309,7 @@
 </script>
 </body>
 </html>
+
 
 
 
