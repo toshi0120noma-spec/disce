@@ -6,182 +6,204 @@
 <title>Dice Fortune | げーまー哲</title>
 <style>
   :root{
-    --accent:#24AAED; --ink:#0a0a0a; --bg:#ffffff; --soft:#f3f6f9;
-    --radius:18px; --shadow:0 10px 30px rgba(0,0,0,.08);
-    --btn-bg:#222; --btn-ink:#EADCC2;
+    --accent:#24AAED;
+    --accent2:#FFD54F;
+    --bg:#ffffff;
+    --ink:#0a0a0a;
+    --soft:#f3f6f9;
+    --radius:18px;
+    --shadow:0 10px 30px rgba(0,0,0,.08);
   }
-  html,body{height:100%;background:var(--bg);color:var(--ink);
-    font-family:ui-sans-serif,system-ui,-apple-system,Segoe UI,Roboto,Helvetica,Arial,"Noto Sans JP","Hiragino Kaku Gothic ProN","Yu Gothic UI","Yu Gothic",Meiryo,sans-serif;}
-  .wrap{max-width:880px;margin:0 auto;padding:24px}
-  .card{background:#fff;border-radius:var(--radius);box-shadow:var(--shadow);padding:22px}
-  .selector-title{display:flex;align-items:center;justify-content:space-between;gap:12px;font-weight:800;font-size:clamp(16px,2.6vw,18px)}
-  .selector-title .arrow{opacity:.6}
-  .stage{margin:12px 0;border-radius:var(--radius);background:var(--soft);padding:22px;display:grid;grid-template-columns:1fr;gap:18px}
-  @media (min-width:760px){ .stage{grid-template-columns:1.1fr 1fr} }
-  .dice-area{display:grid;place-items:center;height:320px;position:relative;overflow:hidden;border-radius:14px;background:radial-gradient(1200px 400px at 50% 0%, rgba(36,170,237,.15), transparent)}
-  @media (min-width:760px){ .dice-area{height:360px} }
-  .badge{position:absolute;top:14px;left:14px;background:#fff;border-radius:999px;padding:6px 10px;font-weight:800;font-size:12px;border:1px solid #e8edf3}
-  .dice-grid{display:grid;grid-template-columns:1fr 1fr;gap:min(5vw,24px);align-items:center;justify-items:center;}
-  .die{width:min(38vw,230px);height:min(38vw,230px);background-size:contain;background-repeat:no-repeat;background-position:center;will-change:transform,filter;transform-style:preserve-3d;filter:drop-shadow(0 14px 28px rgba(0,0,0,.18));position:relative;}
-  .die.spin{animation:spinY 5s cubic-bezier(.2,.7,.2,1) forwards;}
+
+  html,body{
+    height:100%;
+    background:var(--bg);
+    color:var(--ink);
+    font-family:"Noto Sans JP", system-ui, sans-serif;
+  }
+
+  .wrap{max-width:900px;margin:0 auto;padding:24px}
+  .card{background:#fff;border-radius:var(--radius);box-shadow:var(--shadow);padding:28px}
+
+  .stage{
+    display:grid;
+    grid-template-columns:1fr 1fr;
+    align-items:center;
+    gap:32px;
+  }
+
+  .die-area{
+    display:flex;
+    justify-content:center;
+    align-items:center;
+    gap:22px;
+    position:relative;
+  }
+
+  .die{
+    width:min(38vw,200px);
+    height:min(38vw,200px);
+    background-size:contain;
+    background-repeat:no-repeat;
+    background-position:center;
+    position:relative;
+    will-change:transform, filter;
+    transition:transform 1s cubic-bezier(.2,.7,.2,1);
+    filter:drop-shadow(0 10px 18px rgba(0,0,0,.15));
+  }
+
+  .die img{
+    width:100%;
+    height:100%;
+    object-fit:contain;
+  }
+
+  .num{
+    position:absolute;
+    top:50%;
+    left:50%;
+    transform:translate(-50%,-50%);
+    font-weight:900;
+    font-size:clamp(28px,6vw,56px);
+    color:white;
+    text-shadow:0 2px 6px rgba(0,0,0,.4);
+    pointer-events:none;
+  }
+
+  .die.spin{
+    animation:spinY 5s cubic-bezier(.25,.8,.25,1);
+  }
   @keyframes spinY{
-    0%{transform:rotateX(10deg) rotateY(0deg) scale(1);filter:drop-shadow(0 8px 18px rgba(0,0,0,.14));}
-    40%{transform:rotateX(10deg) rotateY(1440deg) scale(1.06);filter:drop-shadow(0 22px 38px rgba(0,0,0,.22));}
-    100%{transform:rotateX(10deg) rotateY(2160deg) scale(1);filter:drop-shadow(0 14px 28px rgba(0,0,0,.18));}
+    0%{transform:rotateY(0deg) rotateX(10deg);}
+    90%{transform:rotateY(1500deg) rotateX(10deg);}
+    100%{transform:rotateY(1490deg) rotateX(14deg);}
   }
-  .die.tilt-a{transition:transform .18s ease;transform:rotateX(14deg) rotateZ(-6deg)}
-  .die.tilt-b{transition:transform .18s ease;transform:rotateX(12deg) rotateZ(5deg)}
-  @media (prefers-reduced-motion:reduce){ .die.spin{animation-duration:.4s}.die.tilt-a,.die.tilt-b{transition-duration:.08s} }
-  .die-num{position:absolute;inset:0;display:grid;place-items:center;font-weight:900;letter-spacing:.02em;font-size:clamp(42px,9vw,76px);color:#fff;text-shadow:0 2px 6px rgba(0,0,0,.35),0 0 1px rgba(0,0,0,.3);opacity:0;transform:scale(.9);transition:opacity .25s ease,transform .25s ease;pointer-events:none;}
-  .die-num.show{opacity:1;transform:scale(1)}
-  .result{display:grid;gap:10px}
-  .result .small{margin:0;opacity:.75;font-size:clamp(14px,2.6vw,16px)}
-  .result .big{margin:0;font-weight:900;font-size:clamp(20px,3.6vw,26px)}
-  .result .sum{margin:0;opacity:.8;font-size:clamp(14px,2.6vw,16px)}
-  .result .comment{margin:0;opacity:.85;font-size:clamp(13px,2.4vw,15px)}
-  .actions{display:flex;gap:10px;flex-wrap:wrap}
-  .btn{border:none;cursor:pointer;font-weight:800;display:inline-flex;align-items:center;gap:12px}
-  .btn.primary{background:var(--btn-bg);color:var(--btn-ink);padding:16px 26px;border-radius:999px;font-size:clamp(14px,2.8vw,18px)}
-  .btn.primary::before{content:"";width:10px;height:10px;border-radius:50%;background:var(--btn-ink);display:inline-block}
+
+  .result{
+    display:flex;
+    flex-direction:column;
+    gap:10px;
+  }
+
+  .fortune-card{
+    background:linear-gradient(145deg,#f9f9f9,#ffffff);
+    border-radius:12px;
+    box-shadow:0 4px 10px rgba(0,0,0,.05);
+    padding:16px 20px;
+  }
+
+  .fortune-card h3{
+    margin:0;
+    font-size:clamp(20px,4vw,28px);
+    font-weight:800;
+  }
+
+  .fortune-card p{
+    margin:4px 0 0;
+    font-size:15px;
+    color:#444;
+  }
+
+  .btn{
+    background:#222;
+    color:#fff;
+    border:none;
+    border-radius:999px;
+    padding:10px 28px;
+    font-weight:700;
+    cursor:pointer;
+    letter-spacing:.05em;
+    transition:background .25s;
+  }
+  .btn:hover{background:#333;}
+
+  @media (max-width:760px){
+    .stage{grid-template-columns:1fr;gap:24px;}
+  }
 </style>
 </head>
 <body>
   <div class="wrap">
     <div class="card">
-      <div class="selector-title"><span>20面ダイスを 2つ 振ります</span><span class="arrow">▶︎</span></div>
       <div class="stage">
-        <div class="dice-area">
-          <span class="badge">d20 × 2</span>
-          <div class="dice-grid">
-            <div class="die" id="dieA" aria-hidden="true"></div>
-            <div class="die" id="dieB" aria-hidden="true"></div>
+        <div class="die-area">
+          <div class="die" id="die1">
+            <img src="img/d20_blue.png" alt="blue die">
+            <div class="num" id="num1">–</div>
           </div>
-          <div class="die-num" id="numA" aria-live="polite"></div>
-          <div class="die-num" id="numB" aria-live="polite" style="left:50%;width:50%"></div>
+          <div class="die" id="die2">
+            <img src="img/d20_yellow.png" alt="yellow die">
+            <div class="num" id="num2">–</div>
+          </div>
         </div>
         <div class="result">
-          <p class="small" id="headline">結果：—</p>
-          <p class="big"   id="fortuneLabel">今日の運勢：—</p>
-          <p class="comment" id="fortuneComment"></p>
-          <p class="sum"   id="sumLabel">合計：—</p>
-          <div class="actions"><button class="btn primary" id="rollBtn">ダイスを振る</button></div>
+          <div class="fortune-card">
+            <h3 id="fortune">今日の運勢：—</h3>
+            <p id="comment">ダイスを振って今日の運勢を占おう！</p>
+            <p id="sum" style="margin-top:6px;font-weight:700;color:#666;"></p>
+          </div>
+          <button class="btn" id="rollBtn">● ダイスを振る</button>
         </div>
       </div>
     </div>
   </div>
 
-<audio id="sfx" src="sound/dice.mp3" preload="auto"></audio>
-
 <script>
-  // ===== PNG（色違い）パス =====
-  const diceImages = { A:'img/d20_a.png', B:'img/d20_b.png' };
-
-  // 要素
-  const dieA = document.getElementById('dieA');
-  const dieB = document.getElementById('dieB');
-  const numA = document.getElementById('numA');
-  const numB = document.getElementById('numB');
-  const headline = document.getElementById('headline');
-  const fortuneLabel = document.getElementById('fortuneLabel');
-  const fortuneComment = document.getElementById('fortuneComment');
-  const sumLabel = document.getElementById('sumLabel');
+  const die1 = document.getElementById('die1');
+  const die2 = document.getElementById('die2');
+  const num1 = document.getElementById('num1');
+  const num2 = document.getElementById('num2');
+  const fortuneEl = document.getElementById('fortune');
+  const commentEl = document.getElementById('comment');
+  const sumEl = document.getElementById('sum');
   const rollBtn = document.getElementById('rollBtn');
-  const sfx = document.getElementById('sfx');
 
-  // 画像適用＆プリロード
-  [diceImages.A, diceImages.B].forEach(src=>{ const i=new Image(); i.src=src; });
-  dieA.style.backgroundImage = `url(${diceImages.A})`;
-  dieB.style.backgroundImage = `url(${diceImages.B})`;
-
-  let endTimer = null;
-
-  // 運勢コメント辞書（キーは“段階名”）
   const fortunes = {
-    "超大吉": ["宇宙規模の幸運。思い切ってGO！", "伝説の一日。配信で自慢しよう！", "願いが叶うフラグ、立ちました。"],
-    "大吉":   ["最高の一日が待ってる！", "今日は勢いで突っ走れ！", "運気MAX！いざ冒険へ！"],
-    "吉":     ["風向き良好！一歩踏み出すと景色が変わる。", "その選択、当たり。押していけ。", "小さな幸運を見逃さないで。"],
-    "中吉":   ["いい感じ。流れに乗ろう。", "少しの工夫で大きな成果が出そう。", "穏やかな幸運が訪れる日。"],
-    "小吉":   ["無理せず行こう。", "静かな努力が後で実を結ぶ。", "控えめが吉。"],
-    "末吉":   ["準備と安全第一で。", "焦らず温存、明日に繋げよう。", "小さな成功を積み上げる日。"],
-    "凶":     ["ダイスは気まぐれ…でも次が本番！", "落ち込むな！再挑戦チャンス！", "これは逆に幸運の前触れかも？"],
-    "大凶":   ["一旦セーブ！今日は慎重に。", "撤退は敗北じゃない、英断だ。", "装備整えて出直せば勝てる。"]
+    "超大吉": ["奇跡の一日が始まる！", "最高の結果を掴もう！", "すべてが味方する日。"],
+    "大吉": ["最高の一日が待ってる！", "今日は勢いで突っ走れ！", "運気MAX！いざ冒険へ！"],
+    "中吉": ["いい感じ。流れに乗ろう。", "少しの工夫で大きな成果が出そう。", "穏やかな幸運が訪れる日。"],
+    "小吉": ["無理せず行こう。", "静かな努力が後で実を結ぶ。", "控えめが吉。"],
+    "末吉": ["小さな幸せに気づこう。", "一歩ずつ前進！", "今は充電の時。"],
+    "凶": ["ダイスは気まぐれ…でも次が本番！", "落ち込むな！再挑戦チャンス！", "これは逆に幸運の前触れかも？"],
+    "大凶": ["嵐の前の静けさ…", "逆境こそチャンス！", "一呼吸おこう。"]
   };
 
-  // 6段階＋ボーナス（ゾロ目・20&20）
-  function fortuneFromPair(a,b){
-    if (a===20 && b===20) return ['スーパークリティカル・超大吉','超大吉'];
-    if (a===b)            return ['クリティカル・大吉','大吉'];
-    const sum=a+b;
-    if (sum>=34) return ['吉','吉'];
-    if (sum>=28) return ['中吉','中吉'];
-    if (sum>=22) return ['小吉','小吉'];
-    if (sum>=16) return ['末吉','末吉'];
-    if (sum>=10) return ['凶','凶'];
-    return ['大凶','大凶'];
+  function getFortune(n1,n2){
+    if(n1===20 && n2===20) return "超大吉";
+    if(n1===n2) return "大吉";
+    const sum = n1+n2;
+    if(sum>=35) return "中吉";
+    if(sum>=25) return "小吉";
+    if(sum>=15) return "末吉";
+    if(sum>=10) return "凶";
+    return "大凶";
   }
 
-  function clearNumbers(){
-    numA.classList.remove('show'); numA.textContent='';
-    numB.classList.remove('show'); numB.textContent='';
+  function rollDie(){
+    die1.classList.remove('spin');
+    die2.classList.remove('spin');
+    void die1.offsetWidth; void die2.offsetWidth;
+    die1.classList.add('spin');
+    die2.classList.add('spin');
+
+    setTimeout(()=>{
+      const n1 = Math.ceil(Math.random()*20);
+      const n2 = Math.ceil(Math.random()*20);
+      num1.textContent = n1;
+      num2.textContent = n2;
+      const fortune = getFortune(n1,n2);
+      const msgs = fortunes[fortune];
+      const msg = msgs[Math.floor(Math.random()*msgs.length)];
+      const sum = n1===n2 ? `⚫︎のゾロ目` : `合計：${n1+n2}`;
+      fortuneEl.textContent = `今日の運勢：${fortune}`;
+      commentEl.textContent = msg;
+      sumEl.textContent = sum;
+    },4800);
   }
 
-  function roll(){
-    try{ sfx.currentTime=0; sfx.play(); }catch(e){}
-    if (endTimer){ clearTimeout(endTimer); endTimer=null; }
-
-    [dieA,dieB].forEach(d=>{ d.classList.remove('tilt-a','tilt-b','spin'); void d.offsetWidth; d.classList.add('spin'); });
-    clearNumbers();
-    headline.textContent='結果：—';
-    fortuneLabel.textContent='今日の運勢：—';
-    fortuneComment.textContent='';
-    sumLabel.textContent='合計：—';
-
-    const ROLL_MS=5000;
-    endTimer=setTimeout(()=>{
-      [dieA,dieB].forEach(d=>d.classList.remove('spin'));
-      setTimeout(()=>{ dieA.classList.add('tilt-a'); dieB.classList.add('tilt-b'); },40);
-
-      const a=1+Math.floor(Math.random()*20);
-      const b=1+Math.floor(Math.random()*20);
-      const sum=a+b;
-      const [display,tier]=fortuneFromPair(a,b);
-
-      headline.textContent=`結果：${a} と ${b}`;
-      fortuneLabel.textContent=`今日の運勢：${display}`;
-      sumLabel.textContent=`合計：${sum}`;
-
-      // ランダムコメント
-      const pool = fortunes[tier] || [];
-      fortuneComment.textContent = pool.length ? pool[Math.floor(Math.random()*pool.length)] : '';
-
-      setTimeout(()=>{ numA.textContent=a; numA.classList.add('show'); numB.textContent=b; numB.classList.add('show'); },140);
-
-      const url=new URL(location.href);
-      url.searchParams.set('r1',a); url.searchParams.set('r2',b);
-      history.replaceState({},'',url);
-
-      endTimer=null;
-    },ROLL_MS);
-  }
-
-  // 復元
-  (function initFromURL(){
-    const p=new URLSearchParams(location.search);
-    const r1=Number(p.get('r1')), r2=Number(p.get('r2'));
-    if (r1>=1&&r1<=20&&r2>=1&&r2<=20){
-      const [display,tier]=fortuneFromPair(r1,r2);
-      headline.textContent=`結果：${r1} と ${r2}`;
-      fortuneLabel.textContent=`今日の運勢：${display}`;
-      sumLabel.textContent=`合計：${r1+r2}`;
-      const pool = fortunes[tier] || [];
-      fortuneComment.textContent = pool.length ? pool[Math.floor(Math.random()*pool.length)] : '';
-      numA.textContent=r1; numB.textContent=r2; numA.classList.add('show'); numB.classList.add('show');
-      dieA.classList.add('tilt-a'); dieB.classList.add('tilt-b');
-    }
-  })();
-
-  rollBtn.addEventListener('click', roll);
+  rollBtn.addEventListener('click', rollDie);
 </script>
 </body>
 </html>
+
 
