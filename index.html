@@ -13,6 +13,7 @@
     --radius:18px;
     --shadow:0 10px 30px rgba(0,0,0,.08);
   }
+
   html,body{height:100%;background:var(--bg);color:var(--ink);font-family:ui-sans-serif,system-ui,-apple-system,Segoe UI,Roboto,Helvetica,Arial,"Noto Sans JP","Hiragino Kaku Gothic ProN","Yu Gothic UI","Yu Gothic",Meiryo,sans-serif;}
   .wrap{max-width:880px;margin:0 auto;padding:24px}
   .card{background:#fff;border-radius:var(--radius);box-shadow:var(--shadow);padding:22px}
@@ -24,20 +25,30 @@
   .chip[aria-pressed="true"]{background:var(--accent);color:#fff;border-color:var(--accent)}
   .stage{margin:16px 0;border-radius:var(--radius);background:var(--soft);padding:22px;display:grid;grid-template-columns:1fr;gap:18px}
   .die-area{display:grid;place-items:center;height:280px;position:relative;overflow:hidden;border-radius:14px;background:radial-gradient(1200px 400px at 50% 0%, rgba(36,170,237,.15), transparent)}
-  .die{width:168px;height:168px;border-radius:24px;display:grid;place-items:center;
-       background: radial-gradient(120px 120px at 30% 25%, rgba(255,255,255,.85), rgba(255,255,255,.35)) ,
-                   linear-gradient(160deg, rgba(255,255,255,.35), rgba(0,0,0,.12)),
-                   linear-gradient(180deg, var(--accent), #0681c9);
-       color:#fff; font-weight:900; font-size:64px; letter-spacing:.02em;
-       box-shadow: 0 18px 40px rgba(0,0,0,.18), inset 0 10px 22px rgba(255,255,255,.25), inset 0 -10px 18px rgba(0,0,0,.2);
-       transform:rotateX(12deg) rotateZ(-8deg);
+
+  /* 画像でダイスを表示（背景画像） */
+  .die{
+    width: min(42vw, 260px);
+    height: min(42vw, 260px);
+    background-size: contain;
+    background-repeat: no-repeat;
+    background-position: center;
+    will-change: transform, filter;
+    transition: transform .8s cubic-bezier(.2,.7,.2,1), filter .2s;
+    transform-style: preserve-3d;
+    filter: drop-shadow(0 14px 28px rgba(0,0,0,.18));
   }
-  .die.spin{animation:spin .8s cubic-bezier(.2,.7,.2,1)}
-  @keyframes spin{
-    0%{transform:rotateX(12deg) rotateZ(-8deg) scale(1)}
-    50%{transform:rotateX(360deg) rotateZ(352deg) scale(1.06)}
-    100%{transform:rotateX(12deg) rotateZ(-8deg) scale(1)}
+
+  /* 回転アニメ（擬似3D） */
+  .die.spin{
+    animation: spinY .8s cubic-bezier(.2,.7,.2,1);
   }
+  @keyframes spinY{
+    0%   { transform: rotateX(8deg) rotateY(0deg) scale(1);   filter: drop-shadow(0 8px 18px rgba(0,0,0,.14)); }
+    50%  { transform: rotateX(8deg) rotateY(360deg) scale(1.06); filter: drop-shadow(0 20px 34px rgba(0,0,0,.22)); }
+    100% { transform: rotateX(8deg) rotateY(720deg) scale(1); }
+  }
+
   .badge{position:absolute;top:14px;left:14px;background:#fff;border-radius:999px;padding:6px 10px;font-weight:800;font-size:12px;border:1px solid #e8edf3}
   .result{display:grid;gap:6px}
   .result h3{margin:0;font-size:clamp(18px,3.4vw,22px)}
@@ -51,7 +62,6 @@
   @media (min-width:760px){
     .stage{grid-template-columns:1.1fr 1fr}
     .die-area{height:320px}
-    .die{width:200px;height:200px;font-size:72px}
   }
 </style>
 </head>
@@ -75,7 +85,7 @@
       <div class="stage">
         <div class="die-area">
           <span class="badge" id="badge">d20</span>
-          <div class="die" id="die" aria-live="polite">—</div>
+          <div class="die" id="die" aria-live="polite"></div>
         </div>
         <div class="result">
           <h3 id="headline">ダイスを振ってみよう！</h3>
@@ -97,29 +107,48 @@
   const params = new URLSearchParams(location.search);
   if(params.get('accent')) document.documentElement.style.setProperty('--accent', params.get('accent'));
 
-  const chips = document.querySelectorAll('.chip');
-  const badge = document.getElementById('badge');
-  const dieEl = document.getElementById('die');
+  // 要素取得
+  const chips    = document.querySelectorAll('.chip');
+  const badge    = document.getElementById('badge');
+  const dieEl    = document.getElementById('die');
   const headline = document.getElementById('headline');
-  const desc = document.getElementById('desc');
-  const rollBtn = document.getElementById('rollBtn');
+  const desc     = document.getElementById('desc');
+  const rollBtn  = document.getElementById('rollBtn');
   const shareBtn = document.getElementById('shareBtn');
 
+  // 画像の場所を設定（必ず img/ にPNGを置いてください）
+  const diceImages = {
+    4:  'img/d4.png',
+    6:  'img/d6.png',
+    8:  'img/d8.png',
+    12: 'img/d12.png',
+    20: 'img/d20.png'
+  };
+
+  // 画像プリロード（チラつき防止）
+  Object.values(diceImages).forEach(src => { const i = new Image(); i.src = src; });
+
+  // 初期値
   let sides = 20;
 
+  function updateDieImage(){
+    dieEl.style.backgroundImage = `url(${diceImages[sides]})`;
+    badge.textContent = 'd' + sides;
+  }
+
+  // ダイス種類の切り替え
   chips.forEach(ch => ch.addEventListener('click', () => {
     chips.forEach(c => c.setAttribute('aria-pressed','false'));
     ch.setAttribute('aria-pressed','true');
     sides = Number(ch.dataset.sides);
-    badge.textContent = 'd' + sides;
-    dieEl.textContent = '—';
+    updateDieImage();
     headline.textContent = 'ダイスを選びました：d' + sides;
     desc.textContent = '「ダイスを振る」を押して結果を出しましょう。';
     history.replaceState({},'',location.pathname + '?s=' + sides);
   }));
 
+  // おみくじメッセージ
   const fortuneText = (n, s) => {
-    // d20：細かめ、それ以外：ざっくり
     if (s === 20){
       if (n === 20) return ['クリティカル！大吉','行動あるのみ。今日のあなたは主役。'];
       if (n >= 16) return ['大吉','流れが来てます。難しめクエストにも挑戦を。'];
@@ -136,21 +165,22 @@
     }
   };
 
+  // 振る（画像は回転、数字はテキストで表示）
   function roll(){
-    // 擬似的な連続乱数で“回ってる感”を演出
-    const spins = 18 + Math.floor(Math.random()*10);
-    let tick = 0;
     dieEl.classList.remove('spin'); void dieEl.offsetWidth; dieEl.classList.add('spin');
+
+    const spins = 18 + Math.floor(Math.random()*10);
+    let tick = 0, last = 1;
+
     const timer = setInterval(()=>{
-      const r = 1 + Math.floor(Math.random()*sides);
-      dieEl.textContent = r;
+      last = 1 + Math.floor(Math.random()*sides); // 中間演出で内部だけ更新
       if(++tick >= spins){
         clearInterval(timer);
-        const n = Number(dieEl.textContent);
+        const n = 1 + Math.floor(Math.random()*sides); // 最終確定
         const [h, d] = fortuneText(n, sides);
         headline.textContent = `結果：${n}（d${sides})  —  ${h}`;
         desc.textContent = d;
-        // URLに結果を記録（共有しやすく）
+
         const url = new URL(location.href);
         url.searchParams.set('s', sides);
         url.searchParams.set('r', n);
@@ -159,7 +189,7 @@
     }, 45);
   }
 
-  // 共有リンク：クリップボードへ
+  // 共有リンク
   function share(){
     const ok = () => {
       shareBtn.textContent = 'コピーしました！';
@@ -168,17 +198,16 @@
     navigator.clipboard?.writeText(location.href).then(ok, ok);
   }
 
-  // 初期状態：URLパラメータから復元
+  // 初期状態：URLから復元
   (function initFromURL(){
     const s = Number(params.get('s'));
     const r = Number(params.get('r'));
     if (s && [4,6,8,12,20].includes(s)){
       sides = s;
       chips.forEach(c => c.setAttribute('aria-pressed', c.dataset.sides==s ? 'true' : 'false'));
-      badge.textContent = 'd' + s;
     }
+    updateDieImage();
     if (r && r>=1 && r<=sides){
-      dieEl.textContent = r;
       const [h, d] = fortuneText(r, sides);
       headline.textContent = `結果：${r}（d${sides})  —  ${h}`;
       desc.textContent = d;
@@ -190,3 +219,4 @@
 </script>
 </body>
 </html>
+
