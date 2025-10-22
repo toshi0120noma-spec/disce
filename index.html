@@ -9,12 +9,11 @@
     --accent:#24AAED; --ink:#0a0a0a; --bg:#ffffff; --soft:#f3f6f9;
     --radius:18px; --shadow:0 10px 30px rgba(0,0,0,.08);
     --btn-bg:#222; --btn-ink:#EADCC2;
-    --avatar:120px;
-    --overlap:10px; /* ボタンの右端を少し重ねる距離 */
+    --overlap:10px;       /* ボタン右端の“ほんの少し”の押し出し */
   }
 
   html,body{
-    height:100%;background:var(--bg);color:var(--ink);
+    height:100%; background:var(--bg); color:var(--ink);
     font-family:ui-sans-serif,system-ui,-apple-system,Segoe UI,Roboto,Helvetica,Arial,"Noto Sans JP","Hiragino Kaku Gothic ProN","Yu Gothic UI","Yu Gothic",Meiryo,sans-serif;
   }
 
@@ -27,18 +26,18 @@
   }
   @media (min-width:760px){ .stage{grid-template-columns:1.1fr 1fr} }
 
-  /* 左：ダイス */
+  /* ===== 左：ダイス ===== */
   .dice-area{
     display:grid;place-items:center;position:relative;border-radius:14px;
     background:radial-gradient(1200px 400px at 50% 0%, rgba(36,170,237,.12), transparent);
-    padding:18px;min-height:340px;overflow:hidden;
+    padding:18px; min-height:340px; overflow:hidden;
   }
   .dice-grid{width:100%;display:grid;grid-template-columns:1fr 1fr;gap:min(5vw,20px);align-items:center;justify-items:center;}
-  .die-wrap{position:relative;display:grid;place-items:center;}
+  .die-wrap{position:relative; display:grid; place-items:center;}
   .die{
-    width:min(32vw,180px);height:min(32vw,180px);
-    background-size:contain;background-repeat:no-repeat;background-position:center;
-    will-change:transform,filter;transform-style:preserve-3d;
+    width:min(32vw,180px); height:min(32vw,180px);
+    background-size:contain; background-repeat:no-repeat; background-position:center;
+    will-change:transform,filter; transform-style:preserve-3d;
     filter:drop-shadow(0 14px 28px rgba(0,0,0,.18));
   }
   .die.spin{animation:spinY 2.2s cubic-bezier(.05,.65,.25,1) forwards;}
@@ -49,59 +48,91 @@
   .die.tilt-a{transition:transform .18s ease;transform:rotateX(14deg) rotateZ(-6deg)}
   .die.tilt-b{transition:transform .18s ease;transform:rotateX(12deg) rotateZ(5deg)}
   .die-num{
-    position:absolute;inset:0;display:grid;place-items:center;
-    font-weight:900;font-size:clamp(38px,8.5vw,68px);
-    color:#fff;text-shadow:0 2px 6px rgba(0,0,0,.35);opacity:0;transform:scale(.9);
-    transition:opacity .25s ease,transform .25s ease;
+    position:absolute; inset:0; display:grid; place-items:center;
+    font-weight:900; font-size:clamp(38px,8.5vw,68px);
+    color:#fff; text-shadow:0 2px 6px rgba(0,0,0,.35);
+    opacity:0; transform:scale(.9); transition:opacity .25s ease,transform .25s ease;
   }
   .die-num.show{opacity:1;transform:scale(1)}
 
-  /* 右：結果 */
+  /* ===== 右：結果（SCORE CARD + 本文 + ボタン） ===== */
   .result{
-    position:relative;border-radius:16px;overflow:hidden;
+    position:relative; border-radius:16px; overflow:hidden;
     background:
       linear-gradient(#fff,#fff) padding-box,
       linear-gradient(135deg, rgba(36,170,237,.28), rgba(36,170,237,0)) border-box;
     border:1px solid transparent;
-    padding:18px 18px calc(18px + 40px + 12px) 18px; /* 下だけボタン分確保 */
-    display:flex;flex-direction:column;height:100%;
+    /* 下だけボタン分の余白を確保（右側はフルに文字を使う） */
+    padding:18px 18px calc(18px + 40px + 12px) 18px;
+    display:flex; flex-direction:column; height:100%;
   }
   .result::before{
-    content:"";position:absolute;left:14px;right:14px;top:10px;height:3px;
-    border-radius:999px;background:linear-gradient(90deg,var(--accent),rgba(36,170,237,.15));
+    content:""; position:absolute; left:14px; right:14px; top:10px; height:3px;
+    border-radius:999px; background:linear-gradient(90deg, var(--accent), rgba(36,170,237,.15));
     opacity:.85;
   }
 
-  .crit{margin:6px 0 4px;font-weight:900;font-size:clamp(16px,3.2vw,20px);}
-  .sum{margin:0;font-weight:800;}
+  /* --- SCORE CARD --- */
+  .score-card{
+    margin:2px 0 12px;
+    background:#f4f6f8; border:1px solid #e7ebf0; border-radius:12px;
+    padding:12px 12px 10px; box-shadow:0 1px 0 rgba(0,0,0,.02) inset;
+  }
+  .score-title{
+    margin:0 0 8px; font-weight:900; font-size:12px; letter-spacing:.18em;
+    color:#64748b; /* slate-500 */
+  }
+  .score-list{display:grid; gap:8px; margin:0; padding:0; list-style:none;}
+  .score-item{
+    display:grid; grid-template-columns:auto 1fr auto; align-items:center; gap:10px;
+    padding:8px 10px; border-radius:10px;
+    background:linear-gradient(#fff,#fff);
+    border:1px solid #eef2f6;
+  }
+  .score-item .badge{
+    font-size:12px; font-weight:800; padding:4px 8px; border-radius:999px;
+    background:#0f172a; color:#fff; letter-spacing:.02em;
+  }
+  .score-item .label{font-weight:800; font-size:14px;}
+  .score-item .hint{font-size:12px; color:#64748b;}
+
+  .score-item.active{border-color:#bfe5f9; box-shadow:0 0 0 3px rgba(36,170,237,.14);}
+  .score-item.active .badge{background:var(--accent);}
+  .score-item.dim{opacity:.6}
+
+  /* 合計用のミニメーター */
+  .meter{height:8px; border-radius:999px; background:#e9eef4; overflow:hidden; width:160px;}
+  .meter .bar{height:100%; background:linear-gradient(90deg, #bee3f8, #38bdf8); width:0%;}
+  .meter .dot{position:relative; width:10px; height:10px; border-radius:50%; background:#0ea5e9; margin-left:-5px; top:-1px; box-shadow:0 0 0 2px #fff; display:none;}
+  .score-item.active .meter .dot{display:block;}
+
+  /* 本文 */
+  .crit{margin:6px 0 4px;font-weight:900;font-size:clamp(16px,3.2vw,20px)}
+  .sum{margin:0;font-weight:800}
   .big{margin:2px 0 0;font-weight:900;font-size:clamp(20px,3.6vw,26px)}
   .comment{margin:8px 0 0;font-size:clamp(13px,2.4vw,15px);line-height:1.8}
 
   .spacer{flex:1}
 
+  /* ボタン：左端は本文と揃え、右端だけ少し押し出し */
   .actions{
-    display:flex;gap:10px;flex-wrap:wrap;justify-content:flex-start;
-    position:relative;z-index:2;
+    display:flex; gap:10px; flex-wrap:wrap; justify-content:flex-start;
+    position:relative; z-index:2;
   }
+  .btn{border:none;cursor:pointer;font-weight:800;display:inline-flex;align-items:center;gap:12px}
   .btn.primary{
-    background:var(--btn-bg);color:var(--btn-ink);
-    padding:10px 44px;border-radius:999px;
-    font-size:clamp(14px,2.8vw,18px);min-height:40px;min-width:220px;
-    position:relative;transform:translateX(var(--overlap)); /* 重ね演出 */
+    background:var(--btn-bg); color:var(--btn-ink);
+    padding:10px 44px; border-radius:999px;
+    font-size:clamp(14px,2.8vw,18px); line-height:1;
+    min-height:40px; min-width:220px; white-space:nowrap;
+    transform:translateX(var(--overlap));
   }
   .btn.primary::before{content:"";width:10px;height:10px;border-radius:50%;background:var(--btn-ink);display:inline-block}
 
-  .avatar{
-    position:absolute;right:12px;
-    bottom:calc(18px + 40px - var(--overlap));
-    width:var(--avatar);height:var(--avatar);
-    border-radius:14px;background:linear-gradient(180deg,#f7fafc,#eef4f9);
-    border:1px solid #e7edf4;box-shadow:var(--shadow);
-    overflow:hidden;z-index:1;
+  @media(max-width:759px){
+    :root{ --overlap:6px; }
+    .meter{width:120px}
   }
-  .avatar img{width:100%;height:100%;object-fit:cover;display:block;}
-
-  @media(max-width:759px){:root{--avatar:96px;--overlap:6px;}}
 </style>
 </head>
 <body>
@@ -111,18 +142,46 @@
         <!-- 左：ダイス -->
         <div class="dice-area">
           <div class="dice-grid">
-            <div class="die-wrap"><div class="die" id="dieA"></div><div class="die-num" id="numA"></div></div>
-            <div class="die-wrap"><div class="die" id="dieB"></div><div class="die-num" id="numB"></div></div>
+            <div class="die-wrap"><div class="die" id="dieA" aria-hidden="true"></div><div class="die-num" id="numA" aria-live="polite"></div></div>
+            <div class="die-wrap"><div class="die" id="dieB" aria-hidden="true"></div><div class="die-num" id="numB" aria-live="polite"></div></div>
           </div>
         </div>
-        <!-- 右：結果 -->
+
+        <!-- 右：SCORE CARD + 結果 -->
         <div class="result">
-          <div class="avatar"><img id="moodIcon" src="icons/mood_calm.png" alt="mood icon"></div>
+          <!-- SCORE CARD -->
+          <div class="score-card" id="scoreCard">
+            <p class="score-title">SCORE CARD</p>
+            <ul class="score-list">
+              <li class="score-item" id="rowSuper">
+                <span class="badge">20×20</span>
+                <span class="label">スーパークリティカル</span>
+                <span class="hint">最上位</span>
+              </li>
+              <li class="score-item" id="rowCrit">
+                <span class="badge">ゾロ目</span>
+                <span class="label">クリティカル（1〜19）</span>
+                <span class="hint">高スコア</span>
+              </li>
+              <li class="score-item" id="rowSum">
+                <span class="badge">合計</span>
+                <span class="label">39 ← 高　…　低 → 3</span>
+                <div class="meter" aria-hidden="true">
+                  <div class="bar" id="sumBar"></div>
+                  <div class="dot" id="sumDot"></div>
+                </div>
+              </li>
+            </ul>
+          </div>
+
+          <!-- 本文 -->
           <p class="crit" id="critBanner" style="display:none;"></p>
           <p class="sum" id="sumLabel">合計：—</p>
           <p class="big" id="fortuneLabel">今日の運勢：—</p>
           <p class="comment" id="fortuneComment"></p>
+
           <div class="spacer"></div>
+
           <div class="actions">
             <button class="btn primary" id="rollBtn">ダイスを振る</button>
           </div>
@@ -131,97 +190,183 @@
     </div>
   </div>
 
-<audio id="sfx" src="sound/dice.mp3" preload="auto"></audio>
+  <audio id="sfx" src="sound/dice.mp3" preload="auto"></audio>
 
 <script>
-const diceImages={A:'img/d20_a.png',B:'img/d20_b.png'};
-const moodByTier={
-  super:'icons/mood_super.png',critical:'icons/mood_crit.png',
-  '超大吉':'icons/mood_super.png','大吉':'icons/mood_crit.png',
-  '吉':'icons/mood_good.png','中吉':'icons/mood_mid.png',
-  '小吉':'icons/mood_calm.png','末吉':'icons/mood_warn.png',
-  '凶':'icons/mood_bad.png','大凶':'icons/mood_bad.png'
-};
-const dieA=document.getElementById('dieA'),dieB=document.getElementById('dieB');
-const numA=document.getElementById('numA'),numB=document.getElementById('numB');
-const fortuneLabel=document.getElementById('fortuneLabel'),fortuneComment=document.getElementById('fortuneComment');
-const sumLabel=document.getElementById('sumLabel'),critBanner=document.getElementById('critBanner');
-const moodIcon=document.getElementById('moodIcon'),rollBtn=document.getElementById('rollBtn'),sfx=document.getElementById('sfx');
+  // ===== 画像パス =====
+  const diceImages = { A:'img/d20_a.png', B:'img/d20_b.png' };
 
-[ diceImages.A, diceImages.B, ...new Set(Object.values(moodByTier)) ].forEach(src=>{const i=new Image();i.src=src;});
-dieA.style.backgroundImage=`url(${diceImages.A})`;dieB.style.backgroundImage=`url(${diceImages.B})`;
-let endTimer=null;
+  // 要素
+  const dieA = document.getElementById('dieA');
+  const dieB = document.getElementById('dieB');
+  const numA = document.getElementById('numA');
+  const numB = document.getElementById('numB');
+  const fortuneLabel = document.getElementById('fortuneLabel');
+  const fortuneComment = document.getElementById('fortuneComment');
+  const sumLabel = document.getElementById('sumLabel');
+  const critBanner = document.getElementById('critBanner');
+  const rollBtn = document.getElementById('rollBtn');
+  const sfx = document.getElementById('sfx');
 
-const fortunes={
-"超大吉":["今日はすべてが味方です。肩の力を抜いて、そのまま進みましょう。","がんばってきたことが、静かに花ひらく日。自分を信じて大丈夫。"],
-"大吉":["いい風が吹いています。素直な一歩が、思わぬ実りに。","あなたの魅力が伝わる日。やさしい言葉から始めてみて。"],
-"吉":["無理をしなくても、ちゃんと前に進めていますよ。","丁寧に選んだ行動が、やがて確かな実感に。"],
-"中吉":["静かな追い風。焦らず、できることから積み重ねましょう。","あなたらしいやり方で大丈夫。落ち着いて、ゆっくりと。"],
-"小吉":["今日は“整える”が吉。休むことも立派な前進です。","やさしい気配りが、思いのほか伝わっていきますよ。"],
-"末吉":["慎重さが味方。今日は深呼吸を多めに。","無理に広げず、今あるものを丁寧に。"],
-"凶":["うまくいかない時は、少しだけ歩みをゆるめましょう。","あたたかい飲み物で一息。明日に期待で大丈夫。"],
-"大凶":["立ち止まる勇気が、あなたを守ってくれます。","いまは温めるとき。整えてからで間に合います。"]
-};
+  // SCORE CARD elements
+  const rowSuper = document.getElementById('rowSuper');
+  const rowCrit  = document.getElementById('rowCrit');
+  const rowSum   = document.getElementById('rowSum');
+  const sumBar   = document.getElementById('sumBar');
+  const sumDot   = document.getElementById('sumDot');
 
-function fortuneFromPair(a,b){
- if(a===20&&b===20)return['スーパークリティカル・超大吉','超大吉','super'];
- if(a===b)return['クリティカル・大吉','大吉','critical'];
- const s=a+b;
- if(s>=34)return['吉','吉',null];
- if(s>=28)return['中吉','中吉',null];
- if(s>=22)return['小吉','小吉',null];
- if(s>=16)return['末吉','末吉',null];
- if(s>=10)return['凶','凶',null];
- return['大凶','大凶',null];
-}
-function clearNumbers(){numA.classList.remove('show');numB.classList.remove('show');numA.textContent='';numB.textContent='';}
-function showCriticalBanner(k){if(!k){critBanner.style.display='none';return;}
-critBanner.innerHTML=(k==='super')?`✦<strong>スーパークリティカル！！</strong>✦`:`✦<strong>クリティカル！</strong>✦`;
-critBanner.style.display='block';}
-function setMoodIcon(tier,k){const key=k?k:tier;const src=moodByTier[key]||'icons/mood_calm.png';moodIcon.src=src;}
+  // プリロード
+  [diceImages.A, diceImages.B].forEach(src=>{ const i=new Image(); i.src=src; });
+  dieA.style.backgroundImage=`url(${diceImages.A})`;
+  dieB.style.backgroundImage=`url(${diceImages.B})`;
 
-function roll(){
- try{sfx.currentTime=0;sfx.play();}catch(e){}
- if(endTimer){clearTimeout(endTimer);endTimer=null;}
- [dieA,dieB].forEach(d=>{d.classList.remove('tilt-a','tilt-b','spin');void d.offsetWidth;d.classList.add('spin');});
- clearNumbers();showCriticalBanner(null);
- fortuneLabel.textContent='今日の運勢：—';fortuneComment.textContent='';sumLabel.textContent='合計：—';
- const ROLL_MS=2200;
- endTimer=setTimeout(()=>{
-  [dieA,dieB].forEach(d=>d.classList.remove('spin'));
-  setTimeout(()=>{dieA.classList.add('tilt-a');dieB.classList.add('tilt-b');},40);
-  const a=1+Math.floor(Math.random()*20),b=1+Math.floor(Math.random()*20);
-  const [disp,tier,critKind]=fortuneFromPair(a,b);
-  const sum=a+b;
-  sumLabel.textContent=(a===b)?`合計：${sum}（${a}のゾロ目）`:`合計：${sum}`;
-  showCriticalBanner(critKind);
-  fortuneLabel.textContent=`今日の運勢：${disp}`;
-  const pool=fortunes[tier]||[];
-  fortuneComment.textContent=pool.length?pool[Math.floor(Math.random()*pool.length)]:'';
-  setMoodIcon(tier,critKind);
-  setTimeout(()=>{numA.textContent=a;numB.textContent=b;numA.classList.add('show');numB.classList.add('show');},140);
-  const url=new URL(location.href);url.searchParams.set('r1',a);url.searchParams.set('r2',b);
-  history.replaceState({},'',url);
-  endTimer=null;
- },ROLL_MS);
-}
+  let endTimer=null;
 
-(function init(){
- const p=new URLSearchParams(location.search);
- const r1=Number(p.get('r1')),r2=Number(p.get('r2'));
- if(r1>=1&&r1<=20&&r2>=1&&r2<=20){
-   const [disp,tier,critKind]=fortuneFromPair(r1,r2);const sum=r1+r2;
-   sumLabel.textContent=(r1===r2)?`合計：${sum}（${r1}のゾロ目）`:`合計：${sum}`;
-   showCriticalBanner(critKind);
-   fortuneLabel.textContent=`今日の運勢：${disp}`;
-   const pool=fortunes[tier]||[];
-   fortuneComment.textContent=pool.length?pool[Math.floor(Math.random()*pool.length)]:'';
-   setMoodIcon(tier,critKind);
-   numA.textContent=r1;numB.textContent=r2;numA.classList.add('show');numB.classList.add('show');
-   dieA.classList.add('tilt-a');dieB.classList.add('tilt-b');
- }else{setMoodIcon('小吉',null);}
-})();
-rollBtn.addEventListener('click',roll);
+  // やさしい女性トーンのコメント
+  const fortunes = {
+    "超大吉": ["今日はすべてが味方です。肩の力を抜いて、そのまま進みましょう。","がんばってきたことが、静かに花ひらく日。自分を信じて大丈夫。"],
+    "大吉":   ["いい風が吹いています。素直な一歩が、思わぬ実りに。","あなたの魅力が伝わる日。やさしい言葉から始めてみて。"],
+    "吉":     ["無理をしなくても、ちゃんと前に進めていますよ。","丁寧に選んだ行動が、やがて確かな実感に。"],
+    "中吉":   ["静かな追い風。焦らず、できることから積み重ねましょう。","あなたらしいやり方で大丈夫。落ち着いて、ゆっくりと。"],
+    "小吉":   ["今日は“整える”が吉。休むことも立派な前進です。","やさしい気配りが、思いのほか伝わっていきますよ。"],
+    "末吉":   ["慎重さが味方。今日は深呼吸を多めに。","無理に広げず、今あるものを丁寧に。"],
+    "凶":     ["うまくいかない時は、少しだけ歩みをゆるめましょう。","あたたかい飲み物で一息。明日に期待で大丈夫。"],
+    "大凶":   ["立ち止まる勇気が、あなたを守ってくれます。","いまは温めるとき。整えてからで間に合います。"]
+  };
+
+  function fortuneFromPair(a,b){
+    if (a===20 && b===20) return ['スーパークリティカル・超大吉','超大吉','super'];
+    if (a===b)            return ['クリティカル・大吉','大吉','critical'];
+    const sum=a+b;
+    if (sum>=34) return ['吉','吉',null];
+    if (sum>=28) return ['中吉','中吉',null];
+    if (sum>=22) return ['小吉','小吉',null];
+    if (sum>=16) return ['末吉','末吉',null];
+    if (sum>=10) return ['凶','凶',null];
+    return ['大凶','大凶',null];
+  }
+
+  function clearNumbers(){ numA.classList.remove('show'); numB.classList.remove('show'); numA.textContent=''; numB.textContent=''; }
+
+  function showCriticalBanner(kind){
+    if (!kind){ critBanner.style.display='none'; critBanner.textContent=''; return; }
+    critBanner.innerHTML = (kind==='super')
+      ? `✦ <strong>スーパークリティカル！！</strong> ✦`
+      : `✦ <strong>クリティカル！</strong> ✦`;
+    critBanner.style.display='block';
+  }
+
+  // ---- SCORE CARD 更新 ----
+  // sumRange: 3〜39（2と40はゾロ目1＆20が担当なので除外）
+  function updateScoreCard(a,b){
+    const sum=a+b;
+    const isSuper=(a===20 && b===20);
+    const isCrit=(a===b && !isSuper);
+
+    // リセット
+    [rowSuper,rowCrit,rowSum].forEach(el=>{
+      el.classList.remove('active','dim');
+    });
+
+    if (isSuper){
+      rowSuper.classList.add('active');
+      rowCrit.classList.add('dim');
+      rowSum.classList.add('dim');
+      setMeter(sum, true);
+      return;
+    }
+    if (isCrit){
+      rowCrit.classList.add('active');
+      rowSuper.classList.add('dim');
+      rowSum.classList.add('dim');
+      setMeter(sum, true);
+      return;
+    }
+    // 通常：合計ハイライト
+    rowSum.classList.add('active');
+    rowSuper.classList.add('dim');
+    rowCrit.classList.add('dim');
+    setMeter(sum, false);
+  }
+
+  function setMeter(sum, muted){
+    // 3〜39 を 0〜100% にマッピング
+    const min=3, max=39;
+    const clamped=Math.max(min, Math.min(max, sum));
+    const pct=((clamped - min) / (max - min)) * 100;
+    sumBar.style.width = muted ? '0%' : pct + '%';
+    sumDot.style.left  = muted ? '0%' : pct + '%';
+  }
+
+  function roll(){
+    try{ sfx.currentTime=0; sfx.play(); }catch(e){}
+    if (endTimer){ clearTimeout(endTimer); endTimer=null; }
+
+    [dieA,dieB].forEach(d=>{ d.classList.remove('tilt-a','tilt-b','spin'); void d.offsetWidth; d.classList.add('spin'); });
+    clearNumbers();
+    showCriticalBanner(null);
+    sumLabel.textContent='合計：—';
+    fortuneLabel.textContent='今日の運勢：—';
+    fortuneComment.textContent='';
+    updateScoreCard(11, 11); // 一時的な見た目の安定用（薄表示）
+
+    const ROLL_MS=2200;
+    endTimer=setTimeout(()=>{
+      [dieA,dieB].forEach(d=>d.classList.remove('spin'));
+      setTimeout(()=>{ dieA.classList.add('tilt-a'); dieB.classList.add('tilt-b'); },40);
+
+      const a=1+Math.floor(Math.random()*20);
+      const b=1+Math.floor(Math.random()*20);
+      const sum=a+b;
+      const [display,tier,critKind]=fortuneFromPair(a,b);
+
+      sumLabel.textContent = (a===b) ? `合計：${sum}（${a}のゾロ目）` : `合計：${sum}`;
+      showCriticalBanner(critKind);
+      fortuneLabel.textContent=`今日の運勢：${display}`;
+      const pool = fortunes[tier] || [];
+      fortuneComment.textContent = pool.length ? pool[Math.floor(Math.random()*pool.length)] : '';
+
+      // SCORE CARD ハイライト
+      updateScoreCard(a,b);
+
+      // 数字表示
+      setTimeout(()=>{
+        numA.textContent=a; numA.classList.add('show');
+        numB.textContent=b; numB.classList.add('show');
+      },140);
+
+      // 共有用
+      const url=new URL(location.href);
+      url.searchParams.set('r1',a); url.searchParams.set('r2',b);
+      history.replaceState({},'',url);
+
+      endTimer=null;
+    },ROLL_MS);
+  }
+
+  // 復元
+  (function initFromURL(){
+    const p=new URLSearchParams(location.search);
+    const r1=Number(p.get('r1')), r2=Number(p.get('r2'));
+    if (r1>=1&&r1<=20&&r2>=1&&r2<=20){
+      const [display,tier,critKind]=fortuneFromPair(r1,r2);
+      const sum=r1+r2;
+      sumLabel.textContent = (r1===r2)?`合計：${sum}（${r1}のゾロ目）`:`合計：${sum}`;
+      showCriticalBanner(critKind);
+      fortuneLabel.textContent=`今日の運勢：${display}`;
+      const pool = fortunes[tier] || [];
+      fortuneComment.textContent = pool.length ? pool[Math.floor(Math.random()*pool.length)] : '';
+      updateScoreCard(r1,r2);
+
+      numA.textContent=r1; numB.textContent=r2; numA.classList.add('show'); numB.classList.add('show');
+      dieA.classList.add('tilt-a'); dieB.classList.add('tilt-b');
+    } else {
+      // 初期状態：スコアカードは説明的に薄表示（合計バー非表示）
+      updateScoreCard(11,11); setMeter(21,true);
+    }
+  })();
+
+  rollBtn.addEventListener('click', roll);
 </script>
 </body>
 </html>
