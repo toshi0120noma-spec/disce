@@ -10,9 +10,7 @@
     --radius:18px; --shadow:0 10px 30px rgba(0,0,0,.08);
     --btn-bg:#222; --btn-ink:#EADCC2;
     --btn-h:40px;
-
-    /* パネルの共通高さ（ここを変えれば全体の縦が変わります） */
-    --panel-h: 300px;
+    --panel-h: 300px; /* PC/Tablet: 共通高さ */
   }
 
   html,body{
@@ -39,7 +37,7 @@
   .die-wrap{position:relative; display:grid; place-items:center;}
   .die{
     width:min(32vw,180px); height:min(32vw,180px);
-    background-size:contain; background-repeat:no-repeat; background-position:center;
+    background-size:contain;background-repeat:no-repeat;background-position:center;
     will-change:transform,filter; transform-style:preserve-3d;
     filter:drop-shadow(0 14px 28px rgba(0,0,0,.18));
   }
@@ -58,15 +56,14 @@
   }
   .die-num.show{opacity:1;transform:scale(1)}
 
-  /* ===== 右：結果（SCORE CARD + 本文 + ボタン） ===== */
+  /* ===== 右：結果 ===== */
   .result{
     position:relative; border-radius:16px; overflow:hidden;
     background:
       linear-gradient(#fff,#fff) padding-box,
       linear-gradient(135deg, rgba(36,170,237,.28), rgba(36,170,237,0)) border-box;
     border:1px solid transparent;
-    /* 下は “ボタン高さ + 余白(2px)” を確保 → はみ出し防止 & 余白短縮 */
-    padding:18px 18px calc(12px + var(--btn-h)) 18px;
+    padding:18px 18px calc(12px + var(--btn-h)) 18px; /* 下はボタン分だけ確保（短め） */
     display:flex; flex-direction:column; min-height:var(--panel-h);
     box-sizing:border-box;
   }
@@ -92,7 +89,7 @@
     padding:8px 10px; border-radius:10px;
     background:linear-gradient(#fff,#fff);
     border:1px solid #eef2f6;
-    min-height:42px; /* 3行の高さを揃える */
+    min-height:42px;
   }
   .score-item .badge{
     font-size:12px; font-weight:800; padding:4px 8px; border-radius:999px;
@@ -103,15 +100,13 @@
   .score-item.active{border-color:#bfe5f9; box-shadow:0 0 0 3px rgba(36,170,237,.14);}
   .score-item.active .badge{background:var(--accent);}
   .score-item.dim{opacity:.6}
-  .score-item.idle{opacity:.45} /* ロール中：全グレー */
+  .score-item.idle{opacity:.45}
 
-  /* --- 結果テキスト領域（高さ固定でぶれない） --- */
+  /* 結果テキスト（高さ予約でブレ防止） */
   .result-text{
     display:flex; flex-direction:column;
-    /* ここで結果表示ぶんの高さを予約（クリティカル帯 + タイトル + コメント） */
-    min-height: 140px;
+    min-height: 140px; /* ここで固定領域確保 */
   }
-  /* クリティカル帯用スペースを常時確保（非表示でも高さを持たせる） */
   .crit-space{min-height:24px; display:flex; align-items:center;}
   .crit{margin:0; font-weight:900; font-size:clamp(16px,3.2vw,20px)}
   .big{margin:6px 0 0; font-weight:900; font-size:clamp(20px,3.6vw,26px)}
@@ -119,7 +114,7 @@
 
   .spacer{flex:1}
 
-  /* ボタン：左端は本文と揃え。下は枠内に収める＆間隔を最小限に */
+  /* ボタン（枠内・余白短め・サイズは従来通り） */
   .actions{
     display:flex; gap:10px; flex-wrap:wrap; justify-content:flex-start;
     position:relative; z-index:2; margin-top:6px;
@@ -133,8 +128,42 @@
   }
   .btn.primary::before{content:"";width:10px;height:10px;border-radius:50%;background:var(--btn-ink);display:inline-block}
 
-  @media(max-width:759px){
-    :root{ --panel-h: 280px; }
+  /* ======== モバイル専用最適化（PC/タブレットには影響しません） ======== */
+  @media (max-width:480px){
+    :root{
+      --panel-h: 240px;    /* パネル高さを縮める */
+      --btn-h: 38px;       /* ボタン少しだけ薄く */
+    }
+    .wrap{padding:14px}
+    .card{padding:14px}
+    .stage{padding:14px; gap:12px}
+
+    .dice-area{padding:12px}
+    .die{ width:min(40vw,140px); height:min(40vw,140px); } /* ダイスを少し小さく */
+    .die-num{font-size:clamp(28px,10vw,48px)}
+
+    .score-card{padding:10px}
+    .score-title{font-size:11px; letter-spacing:.16em; margin-bottom:6px}
+    .score-list{gap:6px}
+    .score-item{min-height:38px; padding:7px 8px; gap:8px}
+    .score-item .badge{font-size:11px; padding:3px 7px}
+    .score-item .label{font-size:13px}
+    .score-item .hint{font-size:11px}
+
+    .result{padding:12px 12px calc(8px + var(--btn-h)) 12px}
+    .result-text{min-height:128px}
+    .crit-space{min-height:22px}
+    .crit{font-size:16px}
+    .big{font-size:20px}
+    .comment{font-size:13px; line-height:1.7}
+
+    .actions{margin-top:4px}
+    .btn.primary{
+      min-width:auto;        /* 端末幅にフィット */
+      width:100%;            /* はみ出さない、タップしやすい */
+      justify-content:center;
+      padding:10px 20px;
+    }
   }
 </style>
 </head>
@@ -174,12 +203,11 @@
             </ul>
           </div>
 
-          <!-- 結果テキスト（高さを予約） -->
+          <!-- 結果テキスト（高さ予約） -->
           <div class="result-text">
             <div class="crit-space">
               <p class="crit" id="critBanner" style="visibility:hidden;">&nbsp;</p>
             </div>
-            <!-- 合計欄は削除（ご要望） -->
             <p class="big" id="fortuneLabel">今日の運勢：—</p>
             <p class="comment" id="fortuneComment"></p>
           </div>
@@ -197,10 +225,8 @@
   <audio id="sfx" src="sound/dice.mp3" preload="auto"></audio>
 
 <script>
-  // ===== 画像パス =====
   const diceImages = { A:'img/d20_a.png', B:'img/d20_b.png' };
 
-  // 要素
   const dieA = document.getElementById('dieA');
   const dieB = document.getElementById('dieB');
   const numA = document.getElementById('numA');
@@ -209,22 +235,18 @@
   const fortuneComment = document.getElementById('fortuneComment');
   const critBanner = document.getElementById('critBanner');
   const rollBtn = document.getElementById('rollBtn');
-  const sfx = document.getElementById('sfx');
 
-  // SCORE CARD elements
   const rowSuper = document.getElementById('rowSuper');
   const rowCrit  = document.getElementById('rowCrit');
   const rowSum   = document.getElementById('rowSum');
   const sumRowLabel = document.getElementById('sumRowLabel');
 
-  // プリロード
   [diceImages.A, diceImages.B].forEach(src=>{ const i=new Image(); i.src=src; });
   dieA.style.backgroundImage=`url(${diceImages.A})`;
   dieB.style.backgroundImage=`url(${diceImages.B})`;
 
   let endTimer=null;
 
-  // やさしい女性トーンのコメント
   const fortunes = {
     "超大吉": ["今日はすべてが味方です。肩の力を抜いて、そのまま進みましょう。","がんばってきたことが、静かに花ひらく日。自分を信じて大丈夫。"],
     "大吉":   ["いい風が吹いています。素直な一歩が、思わぬ実りに。","あなたの魅力が伝わる日。やさしい言葉から始めてみて。"],
@@ -248,45 +270,27 @@
     return ['大凶','大凶',null];
   }
 
-  /* ---- SCORE CARD：状態制御 ---- */
   function setScoreIdle(){
     [rowSuper,rowCrit,rowSum].forEach(el=>{
       el.classList.remove('active','dim');
-      el.classList.add('idle');      // すべてグレー
+      el.classList.add('idle');
     });
     sumRowLabel.textContent = '合計：—（低 3〜39 高）';
   }
   function updateScoreCard(a,b){
-    const sum=a+b;
     const isSuper=(a===20 && b===20);
     const isCrit =(a===b && !isSuper);
-
     [rowSuper,rowCrit,rowSum].forEach(el=>el.classList.remove('idle','active','dim'));
-
-    if (isSuper){
-      rowSuper.classList.add('active');
-      rowCrit.classList.add('dim');
-      rowSum.classList.add('dim');
-    } else if (isCrit){
-      rowCrit.classList.add('active');
-      rowSuper.classList.add('dim');
-      rowSum.classList.add('dim');
-    } else {
-      rowSum.classList.add('active');
-      rowSuper.classList.add('dim');
-      rowCrit.classList.add('dim');
-    }
-    sumRowLabel.textContent = `合計：${sum}（低 3〜39 高）`;
+    if (isSuper){ rowSuper.classList.add('active'); rowCrit.classList.add('dim'); rowSum.classList.add('dim'); }
+    else if (isCrit){ rowCrit.classList.add('active'); rowSuper.classList.add('dim'); rowSum.classList.add('dim'); }
+    else { rowSum.classList.add('active'); rowSuper.classList.add('dim'); rowCrit.classList.add('dim'); }
+    sumRowLabel.textContent = `合計：${a+b}（低 3〜39 高）`;
   }
 
   function clearNumbers(){ numA.classList.remove('show'); numB.classList.remove('show'); numA.textContent=''; numB.textContent=''; }
 
-  function showCritical(kind, sum, a){
-    if (!kind){
-      critBanner.style.visibility='hidden';
-      critBanner.innerHTML='';
-      return;
-    }
+  function showCritical(kind){
+    if (!kind){ critBanner.style.visibility='hidden'; critBanner.innerHTML=''; return; }
     critBanner.innerHTML = (kind==='super')
       ? `✦ <strong>スーパークリティカル！！</strong> ✦`
       : `✦ <strong>クリティカル！</strong> ✦`;
@@ -294,7 +298,7 @@
   }
 
   function roll(){
-    try{ sfx.currentTime=0; sfx.play(); }catch(e){}
+    try{ new AudioContext(); }catch(e){}
     if (endTimer){ clearTimeout(endTimer); endTimer=null; }
 
     [dieA,dieB].forEach(d=>{ d.classList.remove('tilt-a','tilt-b','spin'); void d.offsetWidth; d.classList.add('spin'); });
@@ -302,7 +306,7 @@
     showCritical(null);
     fortuneLabel.textContent='今日の運勢：—';
     fortuneComment.textContent='';
-    setScoreIdle(); // ロール中は全グレー
+    setScoreIdle();
 
     const ROLL_MS=2000;
     endTimer=setTimeout(()=>{
@@ -311,45 +315,38 @@
 
       const a=1+Math.floor(Math.random()*20);
       const b=1+Math.floor(Math.random()*20);
-      const sum=a+b;
       const [display,tier,critKind]=fortuneFromPair(a,b);
 
-      showCritical(critKind, sum, a);
+      showCritical(critKind);
       fortuneLabel.textContent=`今日の運勢：${display}`;
       const pool = fortunes[tier] || [];
       fortuneComment.textContent = pool.length ? pool[Math.floor(Math.random()*pool.length)] : '';
 
       updateScoreCard(a,b);
 
-      setTimeout(()=>{
-        numA.textContent=a; numA.classList.add('show');
-        numB.textContent=b; numB.classList.add('show');
-      },140);
+      setTimeout(()=>{ numA.textContent=a; numA.classList.add('show'); numB.textContent=b; numB.classList.add('show'); },140);
 
-      const url=new URL(location.href);
-      url.searchParams.set('r1',a); url.searchParams.set('r2',b);
+      const url=new URL(location.href); url.searchParams.set('r1',a); url.searchParams.set('r2',b);
       history.replaceState({},'',url);
 
       endTimer=null;
     },ROLL_MS);
   }
 
-  // 復元
   (function initFromURL(){
     const p=new URLSearchParams(location.search);
     const r1=Number(p.get('r1')), r2=Number(p.get('r2'));
     if (r1>=1&&r1<=20&&r2>=1&&r2<=20){
       const [display,tier,critKind]=fortuneFromPair(r1,r2);
-      showCritical(critKind, r1+r2, r1);
+      showCritical(critKind);
       fortuneLabel.textContent=`今日の運勢：${display}`;
       const pool = fortunes[tier] || [];
       fortuneComment.textContent = pool.length ? pool[Math.floor(Math.random()*pool.length)] : '';
       updateScoreCard(r1,r2);
-
       numA.textContent=r1; numB.textContent=r2; numA.classList.add('show'); numB.classList.add('show');
       dieA.classList.add('tilt-a'); dieB.classList.add('tilt-b');
     } else {
-      setScoreIdle(); // 初期は全グレー
+      setScoreIdle();
     }
   })();
 
