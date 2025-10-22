@@ -137,6 +137,10 @@
     .wrap{padding:14px}
     .card{padding:14px}
     .stage{padding:14px; gap:12px}
+@media (max-width:480px){
+  /* 既存のスマホ調整に追加するだけ */
+  .result::before { display: none; }
+}
 
     .dice-area{padding:12px}
     .die{ width:min(40vw,140px); height:min(40vw,140px); } /* ダイスを少し小さく */
@@ -259,8 +263,8 @@
   };
 
   function fortuneFromPair(a,b){
-    if (a===20 && b===20) return ['スーパークリティカル・超大吉','超大吉','super'];
-    if (a===b)            return ['クリティカル・大吉','大吉','critical'];
+    if (a===20 && b===20) return ['超大吉','超大吉','super'];
+    if (a===b)            return ['大吉','大吉','critical'];
     const sum=a+b;
     if (sum>=34) return ['吉','吉',null];
     if (sum>=28) return ['中吉','中吉',null];
