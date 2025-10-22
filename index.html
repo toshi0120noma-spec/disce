@@ -131,16 +131,16 @@
   /* ======== モバイル専用最適化（PC/タブレットには影響しません） ======== */
   @media (max-width:480px){
     :root{
-      --panel-h: 240px;    /* パネル高さを縮める */
-      --btn-h: 38px;       /* ボタン少しだけ薄く */
+      --panel-h: 240px;   /* パネル高さを縮める */
+      --btn-h: 46px;      /* ボタンを少し厚く */
     }
+
     .wrap{padding:14px}
     .card{padding:14px}
     .stage{padding:14px; gap:12px}
-@media (max-width:480px){
-  /* 既存のスマホ調整に追加するだけ */
-  .result::before { display: none; }
-}
+
+    /* スコア表上の青ラインを消す */
+    .result::before { display:none; }
 
     .dice-area{padding:12px}
     .die{ width:min(40vw,140px); height:min(40vw,140px); } /* ダイスを少し小さく */
@@ -154,19 +154,20 @@
     .score-item .label{font-size:13px}
     .score-item .hint{font-size:11px}
 
-    .result{padding:12px 12px calc(8px + var(--btn-h)) 12px}
+    .result{padding:12px 12px calc(10px + var(--btn-h)) 12px}
     .result-text{min-height:128px}
     .crit-space{min-height:22px}
     .crit{font-size:16px}
     .big{font-size:20px}
     .comment{font-size:13px; line-height:1.7}
 
-    .actions{margin-top:4px}
+    .actions{margin-top:4px; justify-content:center;}
     .btn.primary{
-      min-width:auto;        /* 端末幅にフィット */
-      width:100%;            /* はみ出さない、タップしやすい */
+      min-width:auto;         /* 端末幅にフィット */
+      width:88%;              /* ← 横幅を少し短く（100%→88%） */
       justify-content:center;
-      padding:10px 20px;
+      padding:14px 20px;      /* ← 少し厚めに */
+      font-size:16px;         /* ← テキストも少し大きく */
     }
   }
 </style>
