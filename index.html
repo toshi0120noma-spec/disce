@@ -9,8 +9,10 @@
     --accent:#24AAED; --ink:#0a0a0a; --bg:#ffffff; --soft:#f3f6f9;
     --radius:18px; --shadow:0 10px 30px rgba(0,0,0,.08);
     --btn-bg:#222; --btn-ink:#EADCC2;
-    --overlap:10px;                 /* ボタン右端の軽い押し出し（水平のみ） */
     --btn-h:40px;
+
+    /* パネルの共通高さ（ここを変えれば全体の縦が変わります） */
+    --panel-h: 300px;
   }
 
   html,body{
@@ -31,7 +33,7 @@
   .dice-area{
     display:grid;place-items:center;position:relative;border-radius:14px;
     background:radial-gradient(1200px 400px at 50% 0%, rgba(36,170,237,.12), transparent);
-    padding:18px; min-height:340px; overflow:hidden;
+    padding:18px; min-height:var(--panel-h); overflow:hidden;
   }
   .dice-grid{width:100%;display:grid;grid-template-columns:1fr 1fr;gap:min(5vw,20px);align-items:center;justify-items:center;}
   .die-wrap{position:relative; display:grid; place-items:center;}
@@ -41,7 +43,7 @@
     will-change:transform,filter; transform-style:preserve-3d;
     filter:drop-shadow(0 14px 28px rgba(0,0,0,.18));
   }
-  .die.spin{animation:spinY 2.2s cubic-bezier(.05,.65,.25,1) forwards;}
+  .die.spin{animation:spinY 2.0s cubic-bezier(.05,.65,.25,1) forwards;}
   @keyframes spinY{
     0%{transform:rotateX(10deg) rotateY(0deg);}
     100%{transform:rotateX(10deg) rotateY(1440deg);}
@@ -63,9 +65,9 @@
       linear-gradient(#fff,#fff) padding-box,
       linear-gradient(135deg, rgba(36,170,237,.28), rgba(36,170,237,0)) border-box;
     border:1px solid transparent;
-    /* 下は “ボタン高さ + 余白” を確保 → はみ出し防止 */
-    padding:18px 18px calc(18px + var(--btn-h) + 6px) 18px;
-    display:flex; flex-direction:column; height:100%;
+    /* 下は “ボタン高さ + 余白(2px)” を確保 → はみ出し防止 & 余白短縮 */
+    padding:18px 18px calc(12px + var(--btn-h)) 18px;
+    display:flex; flex-direction:column; min-height:var(--panel-h);
     box-sizing:border-box;
   }
   .result::before{
@@ -76,9 +78,9 @@
 
   /* --- SCORE CARD --- */
   .score-card{
-    margin:2px 0 12px;
+    margin:2px 0 10px;
     background:#f4f6f8; border:1px solid #e7ebf0; border-radius:12px;
-    padding:12px 12px 10px; box-shadow:0 1px 0 rgba(0,0,0,.02) inset;
+    padding:12px; box-shadow:0 1px 0 rgba(0,0,0,.02) inset;
   }
   .score-title{
     margin:0 0 8px; font-weight:900; font-size:12px; letter-spacing:.18em;
@@ -98,22 +100,26 @@
   }
   .score-item .label{font-weight:800; font-size:14px; white-space:nowrap; overflow:hidden; text-overflow:ellipsis;}
   .score-item .hint{font-size:12px; color:#111; opacity:.8;}
-
-  /* 状態表現 */
   .score-item.active{border-color:#bfe5f9; box-shadow:0 0 0 3px rgba(36,170,237,.14);}
   .score-item.active .badge{background:var(--accent);}
   .score-item.dim{opacity:.6}
   .score-item.idle{opacity:.45} /* ロール中：全グレー */
 
-  /* 本文 */
-  .crit{margin:6px 0 4px;font-weight:900;font-size:clamp(16px,3.2vw,20px)}
-  .sum{margin:0 0 2px 0;font-weight:800}
-  .big{margin:2px 0 0;font-weight:900;font-size:clamp(20px,3.6vw,26px)}
-  .comment{margin:6px 0 0;font-size:clamp(13px,2.4vw,15px);line-height:1.8}
+  /* --- 結果テキスト領域（高さ固定でぶれない） --- */
+  .result-text{
+    display:flex; flex-direction:column;
+    /* ここで結果表示ぶんの高さを予約（クリティカル帯 + タイトル + コメント） */
+    min-height: 140px;
+  }
+  /* クリティカル帯用スペースを常時確保（非表示でも高さを持たせる） */
+  .crit-space{min-height:24px; display:flex; align-items:center;}
+  .crit{margin:0; font-weight:900; font-size:clamp(16px,3.2vw,20px)}
+  .big{margin:6px 0 0; font-weight:900; font-size:clamp(20px,3.6vw,26px)}
+  .comment{margin:6px 0 0; font-size:clamp(13px,2.4vw,15px); line-height:1.8}
 
   .spacer{flex:1}
 
-  /* ボタン：左端は本文と揃え、右端だけ水平に少し押し出し。下は枠内に収める */
+  /* ボタン：左端は本文と揃え。下は枠内に収める＆間隔を最小限に */
   .actions{
     display:flex; gap:10px; flex-wrap:wrap; justify-content:flex-start;
     position:relative; z-index:2; margin-top:6px;
@@ -124,12 +130,11 @@
     padding:10px 44px; border-radius:999px;
     font-size:clamp(14px,2.8vw,18px); line-height:1;
     min-height:var(--btn-h); min-width:220px; white-space:nowrap;
-    transform:translateX(var(--overlap));
   }
   .btn.primary::before{content:"";width:10px;height:10px;border-radius:50%;background:var(--btn-ink);display:inline-block}
 
   @media(max-width:759px){
-    :root{ --overlap:6px; }
+    :root{ --panel-h: 280px; }
   }
 </style>
 </head>
@@ -163,17 +168,21 @@
               </li>
               <li class="score-item" id="rowSum">
                 <span class="badge">合計</span>
-                <span class="label" id="sumRowLabel">合計：—（範囲 3〜39）</span>
+                <span class="label" id="sumRowLabel">合計：—（低 3〜39 高）</span>
                 <span class="hint">★☆☆</span>
               </li>
             </ul>
           </div>
 
-          <!-- 本文 -->
-          <p class="crit" id="critBanner" style="display:none;"></p>
-          <p class="sum" id="sumLabel">合計：—</p>
-          <p class="big" id="fortuneLabel">今日の運勢：—</p>
-          <p class="comment" id="fortuneComment"></p>
+          <!-- 結果テキスト（高さを予約） -->
+          <div class="result-text">
+            <div class="crit-space">
+              <p class="crit" id="critBanner" style="visibility:hidden;">&nbsp;</p>
+            </div>
+            <!-- 合計欄は削除（ご要望） -->
+            <p class="big" id="fortuneLabel">今日の運勢：—</p>
+            <p class="comment" id="fortuneComment"></p>
+          </div>
 
           <div class="spacer"></div>
 
@@ -198,8 +207,6 @@
   const numB = document.getElementById('numB');
   const fortuneLabel = document.getElementById('fortuneLabel');
   const fortuneComment = document.getElementById('fortuneComment');
-  const sumLabel = document.getElementById('sumLabel');
-  const sumRowLabel = document.getElementById('sumRowLabel');
   const critBanner = document.getElementById('critBanner');
   const rollBtn = document.getElementById('rollBtn');
   const sfx = document.getElementById('sfx');
@@ -208,6 +215,7 @@
   const rowSuper = document.getElementById('rowSuper');
   const rowCrit  = document.getElementById('rowCrit');
   const rowSum   = document.getElementById('rowSum');
+  const sumRowLabel = document.getElementById('sumRowLabel');
 
   // プリロード
   [diceImages.A, diceImages.B].forEach(src=>{ const i=new Image(); i.src=src; });
@@ -216,7 +224,7 @@
 
   let endTimer=null;
 
-  // コメント（やさしい女性トーン）
+  // やさしい女性トーンのコメント
   const fortunes = {
     "超大吉": ["今日はすべてが味方です。肩の力を抜いて、そのまま進みましょう。","がんばってきたことが、静かに花ひらく日。自分を信じて大丈夫。"],
     "大吉":   ["いい風が吹いています。素直な一歩が、思わぬ実りに。","あなたの魅力が伝わる日。やさしい言葉から始めてみて。"],
@@ -246,14 +254,13 @@
       el.classList.remove('active','dim');
       el.classList.add('idle');      // すべてグレー
     });
-    sumRowLabel.textContent = '合計：—（範囲 3〜39）';
+    sumRowLabel.textContent = '合計：—（低 3〜39 高）';
   }
   function updateScoreCard(a,b){
     const sum=a+b;
     const isSuper=(a===20 && b===20);
     const isCrit =(a===b && !isSuper);
 
-    // いったん idle を外す
     [rowSuper,rowCrit,rowSum].forEach(el=>el.classList.remove('idle','active','dim'));
 
     if (isSuper){
@@ -269,17 +276,21 @@
       rowSuper.classList.add('dim');
       rowCrit.classList.add('dim');
     }
-    sumRowLabel.textContent = `合計：${sum}（範囲 3〜39）`;
+    sumRowLabel.textContent = `合計：${sum}（低 3〜39 高）`;
   }
 
   function clearNumbers(){ numA.classList.remove('show'); numB.classList.remove('show'); numA.textContent=''; numB.textContent=''; }
 
-  function showCriticalBanner(kind){
-    if (!kind){ critBanner.style.display='none'; critBanner.textContent=''; return; }
+  function showCritical(kind, sum, a){
+    if (!kind){
+      critBanner.style.visibility='hidden';
+      critBanner.innerHTML='';
+      return;
+    }
     critBanner.innerHTML = (kind==='super')
       ? `✦ <strong>スーパークリティカル！！</strong> ✦`
       : `✦ <strong>クリティカル！</strong> ✦`;
-    critBanner.style.display='block';
+    critBanner.style.visibility='visible';
   }
 
   function roll(){
@@ -288,13 +299,12 @@
 
     [dieA,dieB].forEach(d=>{ d.classList.remove('tilt-a','tilt-b','spin'); void d.offsetWidth; d.classList.add('spin'); });
     clearNumbers();
-    showCriticalBanner(null);
-    sumLabel.textContent='合計：—';
+    showCritical(null);
     fortuneLabel.textContent='今日の運勢：—';
     fortuneComment.textContent='';
-    setScoreIdle(); // ← ロール中は全行グレー
+    setScoreIdle(); // ロール中は全グレー
 
-    const ROLL_MS=2200;
+    const ROLL_MS=2000;
     endTimer=setTimeout(()=>{
       [dieA,dieB].forEach(d=>d.classList.remove('spin'));
       setTimeout(()=>{ dieA.classList.add('tilt-a'); dieB.classList.add('tilt-b'); },40);
@@ -304,8 +314,7 @@
       const sum=a+b;
       const [display,tier,critKind]=fortuneFromPair(a,b);
 
-      sumLabel.textContent = (a===b) ? `合計：${sum}（${a}のゾロ目）` : `合計：${sum}`;
-      showCriticalBanner(critKind);
+      showCritical(critKind, sum, a);
       fortuneLabel.textContent=`今日の運勢：${display}`;
       const pool = fortunes[tier] || [];
       fortuneComment.textContent = pool.length ? pool[Math.floor(Math.random()*pool.length)] : '';
@@ -331,9 +340,7 @@
     const r1=Number(p.get('r1')), r2=Number(p.get('r2'));
     if (r1>=1&&r1<=20&&r2>=1&&r2<=20){
       const [display,tier,critKind]=fortuneFromPair(r1,r2);
-      const sum=r1+r2;
-      sumLabel.textContent = (r1===r2)?`合計：${sum}（${r1}のゾロ目）`:`合計：${sum}`;
-      showCriticalBanner(critKind);
+      showCritical(critKind, r1+r2, r1);
       fortuneLabel.textContent=`今日の運勢：${display}`;
       const pool = fortunes[tier] || [];
       fortuneComment.textContent = pool.length ? pool[Math.floor(Math.random()*pool.length)] : '';
