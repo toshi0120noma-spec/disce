@@ -9,7 +9,8 @@
     --accent:#24AAED; --ink:#0a0a0a; --bg:#ffffff; --soft:#f3f6f9;
     --radius:18px; --shadow:0 10px 30px rgba(0,0,0,.08);
     --btn-bg:#222; --btn-ink:#EADCC2;
-    --overlap:10px;       /* ボタン右端の“ほんの少し”の押し出し */
+    --overlap:10px;                 /* ボタン右端の軽い押し出し（水平のみ） */
+    --btn-h:40px;
   }
 
   html,body{
@@ -62,9 +63,10 @@
       linear-gradient(#fff,#fff) padding-box,
       linear-gradient(135deg, rgba(36,170,237,.28), rgba(36,170,237,0)) border-box;
     border:1px solid transparent;
-    /* 下だけボタン分の余白を確保（右側はフルに文字を使う） */
-    padding:18px 18px calc(18px + 40px + 12px) 18px;
+    /* 下は “ボタン高さ + 余白” を確保 → はみ出し防止 */
+    padding:18px 18px calc(18px + var(--btn-h) + 6px) 18px;
     display:flex; flex-direction:column; height:100%;
+    box-sizing:border-box;
   }
   .result::before{
     content:""; position:absolute; left:14px; right:14px; top:10px; height:3px;
@@ -80,7 +82,7 @@
   }
   .score-title{
     margin:0 0 8px; font-weight:900; font-size:12px; letter-spacing:.18em;
-    color:#64748b; /* slate-500 */
+    color:#64748b;
   }
   .score-list{display:grid; gap:8px; margin:0; padding:0; list-style:none;}
   .score-item{
@@ -88,50 +90,46 @@
     padding:8px 10px; border-radius:10px;
     background:linear-gradient(#fff,#fff);
     border:1px solid #eef2f6;
+    min-height:42px; /* 3行の高さを揃える */
   }
   .score-item .badge{
     font-size:12px; font-weight:800; padding:4px 8px; border-radius:999px;
     background:#0f172a; color:#fff; letter-spacing:.02em;
   }
-  .score-item .label{font-weight:800; font-size:14px;}
-  .score-item .hint{font-size:12px; color:#64748b;}
+  .score-item .label{font-weight:800; font-size:14px; white-space:nowrap; overflow:hidden; text-overflow:ellipsis;}
+  .score-item .hint{font-size:12px; color:#111; opacity:.8;}
 
+  /* 状態表現 */
   .score-item.active{border-color:#bfe5f9; box-shadow:0 0 0 3px rgba(36,170,237,.14);}
   .score-item.active .badge{background:var(--accent);}
   .score-item.dim{opacity:.6}
-
-  /* 合計用のミニメーター */
-  .meter{height:8px; border-radius:999px; background:#e9eef4; overflow:hidden; width:160px;}
-  .meter .bar{height:100%; background:linear-gradient(90deg, #bee3f8, #38bdf8); width:0%;}
-  .meter .dot{position:relative; width:10px; height:10px; border-radius:50%; background:#0ea5e9; margin-left:-5px; top:-1px; box-shadow:0 0 0 2px #fff; display:none;}
-  .score-item.active .meter .dot{display:block;}
+  .score-item.idle{opacity:.45} /* ロール中：全グレー */
 
   /* 本文 */
   .crit{margin:6px 0 4px;font-weight:900;font-size:clamp(16px,3.2vw,20px)}
-  .sum{margin:0;font-weight:800}
+  .sum{margin:0 0 2px 0;font-weight:800}
   .big{margin:2px 0 0;font-weight:900;font-size:clamp(20px,3.6vw,26px)}
-  .comment{margin:8px 0 0;font-size:clamp(13px,2.4vw,15px);line-height:1.8}
+  .comment{margin:6px 0 0;font-size:clamp(13px,2.4vw,15px);line-height:1.8}
 
   .spacer{flex:1}
 
-  /* ボタン：左端は本文と揃え、右端だけ少し押し出し */
+  /* ボタン：左端は本文と揃え、右端だけ水平に少し押し出し。下は枠内に収める */
   .actions{
     display:flex; gap:10px; flex-wrap:wrap; justify-content:flex-start;
-    position:relative; z-index:2;
+    position:relative; z-index:2; margin-top:6px;
   }
   .btn{border:none;cursor:pointer;font-weight:800;display:inline-flex;align-items:center;gap:12px}
   .btn.primary{
     background:var(--btn-bg); color:var(--btn-ink);
     padding:10px 44px; border-radius:999px;
     font-size:clamp(14px,2.8vw,18px); line-height:1;
-    min-height:40px; min-width:220px; white-space:nowrap;
+    min-height:var(--btn-h); min-width:220px; white-space:nowrap;
     transform:translateX(var(--overlap));
   }
   .btn.primary::before{content:"";width:10px;height:10px;border-radius:50%;background:var(--btn-ink);display:inline-block}
 
   @media(max-width:759px){
     :root{ --overlap:6px; }
-    .meter{width:120px}
   }
 </style>
 </head>
@@ -156,20 +154,17 @@
               <li class="score-item" id="rowSuper">
                 <span class="badge">20×20</span>
                 <span class="label">スーパークリティカル</span>
-                <span class="hint">最上位</span>
+                <span class="hint">★★★</span>
               </li>
               <li class="score-item" id="rowCrit">
                 <span class="badge">ゾロ目</span>
                 <span class="label">クリティカル（1〜19）</span>
-                <span class="hint">高スコア</span>
+                <span class="hint">★★☆</span>
               </li>
               <li class="score-item" id="rowSum">
                 <span class="badge">合計</span>
-                <span class="label">39 ← 高　…　低 → 3</span>
-                <div class="meter" aria-hidden="true">
-                  <div class="bar" id="sumBar"></div>
-                  <div class="dot" id="sumDot"></div>
-                </div>
+                <span class="label" id="sumRowLabel">合計：—（範囲 3〜39）</span>
+                <span class="hint">★☆☆</span>
               </li>
             </ul>
           </div>
@@ -204,6 +199,7 @@
   const fortuneLabel = document.getElementById('fortuneLabel');
   const fortuneComment = document.getElementById('fortuneComment');
   const sumLabel = document.getElementById('sumLabel');
+  const sumRowLabel = document.getElementById('sumRowLabel');
   const critBanner = document.getElementById('critBanner');
   const rollBtn = document.getElementById('rollBtn');
   const sfx = document.getElementById('sfx');
@@ -212,8 +208,6 @@
   const rowSuper = document.getElementById('rowSuper');
   const rowCrit  = document.getElementById('rowCrit');
   const rowSum   = document.getElementById('rowSum');
-  const sumBar   = document.getElementById('sumBar');
-  const sumDot   = document.getElementById('sumDot');
 
   // プリロード
   [diceImages.A, diceImages.B].forEach(src=>{ const i=new Image(); i.src=src; });
@@ -222,7 +216,7 @@
 
   let endTimer=null;
 
-  // やさしい女性トーンのコメント
+  // コメント（やさしい女性トーン）
   const fortunes = {
     "超大吉": ["今日はすべてが味方です。肩の力を抜いて、そのまま進みましょう。","がんばってきたことが、静かに花ひらく日。自分を信じて大丈夫。"],
     "大吉":   ["いい風が吹いています。素直な一歩が、思わぬ実りに。","あなたの魅力が伝わる日。やさしい言葉から始めてみて。"],
@@ -246,6 +240,38 @@
     return ['大凶','大凶',null];
   }
 
+  /* ---- SCORE CARD：状態制御 ---- */
+  function setScoreIdle(){
+    [rowSuper,rowCrit,rowSum].forEach(el=>{
+      el.classList.remove('active','dim');
+      el.classList.add('idle');      // すべてグレー
+    });
+    sumRowLabel.textContent = '合計：—（範囲 3〜39）';
+  }
+  function updateScoreCard(a,b){
+    const sum=a+b;
+    const isSuper=(a===20 && b===20);
+    const isCrit =(a===b && !isSuper);
+
+    // いったん idle を外す
+    [rowSuper,rowCrit,rowSum].forEach(el=>el.classList.remove('idle','active','dim'));
+
+    if (isSuper){
+      rowSuper.classList.add('active');
+      rowCrit.classList.add('dim');
+      rowSum.classList.add('dim');
+    } else if (isCrit){
+      rowCrit.classList.add('active');
+      rowSuper.classList.add('dim');
+      rowSum.classList.add('dim');
+    } else {
+      rowSum.classList.add('active');
+      rowSuper.classList.add('dim');
+      rowCrit.classList.add('dim');
+    }
+    sumRowLabel.textContent = `合計：${sum}（範囲 3〜39）`;
+  }
+
   function clearNumbers(){ numA.classList.remove('show'); numB.classList.remove('show'); numA.textContent=''; numB.textContent=''; }
 
   function showCriticalBanner(kind){
@@ -254,48 +280,6 @@
       ? `✦ <strong>スーパークリティカル！！</strong> ✦`
       : `✦ <strong>クリティカル！</strong> ✦`;
     critBanner.style.display='block';
-  }
-
-  // ---- SCORE CARD 更新 ----
-  // sumRange: 3〜39（2と40はゾロ目1＆20が担当なので除外）
-  function updateScoreCard(a,b){
-    const sum=a+b;
-    const isSuper=(a===20 && b===20);
-    const isCrit=(a===b && !isSuper);
-
-    // リセット
-    [rowSuper,rowCrit,rowSum].forEach(el=>{
-      el.classList.remove('active','dim');
-    });
-
-    if (isSuper){
-      rowSuper.classList.add('active');
-      rowCrit.classList.add('dim');
-      rowSum.classList.add('dim');
-      setMeter(sum, true);
-      return;
-    }
-    if (isCrit){
-      rowCrit.classList.add('active');
-      rowSuper.classList.add('dim');
-      rowSum.classList.add('dim');
-      setMeter(sum, true);
-      return;
-    }
-    // 通常：合計ハイライト
-    rowSum.classList.add('active');
-    rowSuper.classList.add('dim');
-    rowCrit.classList.add('dim');
-    setMeter(sum, false);
-  }
-
-  function setMeter(sum, muted){
-    // 3〜39 を 0〜100% にマッピング
-    const min=3, max=39;
-    const clamped=Math.max(min, Math.min(max, sum));
-    const pct=((clamped - min) / (max - min)) * 100;
-    sumBar.style.width = muted ? '0%' : pct + '%';
-    sumDot.style.left  = muted ? '0%' : pct + '%';
   }
 
   function roll(){
@@ -308,7 +292,7 @@
     sumLabel.textContent='合計：—';
     fortuneLabel.textContent='今日の運勢：—';
     fortuneComment.textContent='';
-    updateScoreCard(11, 11); // 一時的な見た目の安定用（薄表示）
+    setScoreIdle(); // ← ロール中は全行グレー
 
     const ROLL_MS=2200;
     endTimer=setTimeout(()=>{
@@ -326,16 +310,13 @@
       const pool = fortunes[tier] || [];
       fortuneComment.textContent = pool.length ? pool[Math.floor(Math.random()*pool.length)] : '';
 
-      // SCORE CARD ハイライト
       updateScoreCard(a,b);
 
-      // 数字表示
       setTimeout(()=>{
         numA.textContent=a; numA.classList.add('show');
         numB.textContent=b; numB.classList.add('show');
       },140);
 
-      // 共有用
       const url=new URL(location.href);
       url.searchParams.set('r1',a); url.searchParams.set('r2',b);
       history.replaceState({},'',url);
@@ -361,8 +342,7 @@
       numA.textContent=r1; numB.textContent=r2; numA.classList.add('show'); numB.classList.add('show');
       dieA.classList.add('tilt-a'); dieB.classList.add('tilt-b');
     } else {
-      // 初期状態：スコアカードは説明的に薄表示（合計バー非表示）
-      updateScoreCard(11,11); setMeter(21,true);
+      setScoreIdle(); // 初期は全グレー
     }
   })();
 
@@ -370,7 +350,6 @@
 </script>
 </body>
 </html>
-
 
 
 
