@@ -10,191 +10,383 @@
     --radius:18px; --shadow:0 10px 30px rgba(0,0,0,.08);
     --btn-bg:#222; --btn-ink:#EADCC2;
     --btn-h:40px;
-    --panel-h:300px;
+    --panel-h: 300px; /* PC/Tablet: 共通高さ */
   }
+
   html,body{
     height:100%; background:var(--bg); color:var(--ink);
     font-family:ui-sans-serif,system-ui,-apple-system,Segoe UI,Roboto,Helvetica,Arial,"Noto Sans JP","Hiragino Kaku Gothic ProN","Yu Gothic UI","Yu Gothic",Meiryo,sans-serif;
   }
+
   .wrap{max-width:880px;margin:0 auto;padding:24px}
   .card{background:#fff;border-radius:var(--radius);box-shadow:var(--shadow);padding:22px}
-  .stage{margin:4px 0;border-radius:var(--radius);background:var(--soft);padding:22px;display:grid;grid-template-columns:1fr;gap:18px;align-items:stretch;}
-  @media (min-width:760px){.stage{grid-template-columns:1.1fr 1fr}}
+
+  .stage{
+    margin:4px 0;border-radius:var(--radius);background:var(--soft);padding:22px;
+    display:grid;grid-template-columns:1fr;gap:18px;align-items:stretch;
+  }
+  @media (min-width:760px){ .stage{grid-template-columns:1.1fr 1fr} }
+
   /* ===== 左：ダイス ===== */
   .dice-area{
     display:grid;place-items:center;position:relative;border-radius:14px;
     background:radial-gradient(1200px 400px at 50% 0%, rgba(36,170,237,.12), transparent);
-    padding:18px;min-height:var(--panel-h);overflow:hidden;
+    padding:18px; min-height:var(--panel-h); overflow:hidden;
   }
   .dice-grid{width:100%;display:grid;grid-template-columns:1fr 1fr;gap:min(5vw,20px);align-items:center;justify-items:center;}
-  .die-wrap{position:relative;display:grid;place-items:center;}
-  .die{width:min(32vw,180px);height:min(32vw,180px);background-size:contain;background-repeat:no-repeat;background-position:center;will-change:transform,filter;transform-style:preserve-3d;filter:drop-shadow(0 14px 28px rgba(0,0,0,.18));}
+  .die-wrap{position:relative; display:grid; place-items:center;}
+  .die{
+    width:min(32vw,180px); height:min(32vw,180px);
+    background-size:contain;background-repeat:no-repeat;background-position:center;
+    will-change:transform,filter; transform-style:preserve-3d;
+    filter:drop-shadow(0 14px 28px rgba(0,0,0,.18));
+  }
   .die.spin{animation:spinY 2.0s cubic-bezier(.05,.65,.25,1) forwards;}
-  @keyframes spinY{0%{transform:rotateX(10deg) rotateY(0deg);}100%{transform:rotateX(10deg) rotateY(1440deg);}}
+  @keyframes spinY{
+    0%{transform:rotateX(10deg) rotateY(0deg);}
+    100%{transform:rotateX(10deg) rotateY(1440deg);}
+  }
   .die.tilt-a{transition:transform .18s ease;transform:rotateX(14deg) rotateZ(-6deg)}
   .die.tilt-b{transition:transform .18s ease;transform:rotateX(12deg) rotateZ(5deg)}
-  .die-num{position:absolute;inset:0;display:grid;place-items:center;font-weight:900;font-size:clamp(38px,8.5vw,68px);color:#fff;text-shadow:0 2px 6px rgba(0,0,0,.35);opacity:0;transform:scale(.9);transition:opacity .25s ease,transform .25s ease;}
-  .die-num.show{opacity:1;transform:scale(1)}
-  /* ===== 右：結果 ===== */
-  .result{position:relative;border-radius:16px;overflow:hidden;
-    background:linear-gradient(#fff,#fff) padding-box,linear-gradient(135deg, rgba(36,170,237,.28), rgba(36,170,237,0)) border-box;
-    border:1px solid transparent;padding:18px 18px calc(12px + var(--btn-h)) 18px;
-    display:flex;flex-direction:column;min-height:var(--panel-h);box-sizing:border-box;
+  .die-num{
+    position:absolute; inset:0; display:grid; place-items:center;
+    font-weight:900; font-size:clamp(38px,8.5vw,68px);
+    color:#fff; text-shadow:0 2px 6px rgba(0,0,0,.35);
+    opacity:0; transform:scale(.9); transition:opacity .25s ease,transform .25s ease;
   }
-  .result::before{content:"";position:absolute;left:14px;right:14px;top:10px;height:3px;border-radius:999px;background:linear-gradient(90deg,var(--accent),rgba(36,170,237,.15));opacity:.85;}
+  .die-num.show{opacity:1;transform:scale(1)}
+
+  /* ===== 右：結果 ===== */
+  .result{
+    position:relative; border-radius:16px; overflow:hidden;
+    background:
+      linear-gradient(#fff,#fff) padding-box,
+      linear-gradient(135deg, rgba(36,170,237,.28), rgba(36,170,237,0)) border-box;
+    border:1px solid transparent;
+    padding:18px 18px calc(12px + var(--btn-h)) 18px; /* 下はボタン分だけ確保（短め） */
+    display:flex; flex-direction:column; min-height:var(--panel-h);
+    box-sizing:border-box;
+  }
+  .result::before{
+    content:""; position:absolute; left:14px; right:14px; top:10px; height:3px;
+    border-radius:999px; background:linear-gradient(90deg, var(--accent), rgba(36,170,237,.15));
+    opacity:.85;
+  }
+
   /* --- SCORE CARD --- */
-  .score-card{margin:2px 0 10px;background:#f4f6f8;border:1px solid #e7ebf0;border-radius:12px;padding:12px;box-shadow:0 1px 0 rgba(0,0,0,.02) inset;}
-  .score-title{margin:0 0 8px;font-weight:900;font-size:12px;letter-spacing:.18em;color:#64748b;}
-  .score-list{display:grid;gap:8px;margin:0;padding:0;list-style:none;}
-  .score-item{display:grid;grid-template-columns:auto 1fr auto;align-items:center;gap:10px;padding:8px 10px;border-radius:10px;background:linear-gradient(#fff,#fff);border:1px solid #eef2f6;min-height:42px;}
-  .score-item .badge{font-size:12px;font-weight:800;padding:4px 8px;border-radius:999px;background:#0f172a;color:#fff;letter-spacing:.02em;}
-  .score-item .label{font-weight:800;font-size:14px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
-  .score-item .hint{font-size:12px;color:#111;opacity:.8;}
-  .score-item.active{border-color:#bfe5f9;box-shadow:0 0 0 3px rgba(36,170,237,.14);}
+  .score-card{
+    margin:2px 0 10px;
+    background:#f4f6f8; border:1px solid #e7ebf0; border-radius:12px;
+    padding:12px; box-shadow:0 1px 0 rgba(0,0,0,.02) inset;
+  }
+  .score-title{
+    margin:0 0 8px; font-weight:900; font-size:12px; letter-spacing:.18em;
+    color:#64748b;
+  }
+  .score-list{display:grid; gap:8px; margin:0; padding:0; list-style:none;}
+  .score-item{
+    display:grid; grid-template-columns:auto 1fr auto; align-items:center; gap:10px;
+    padding:8px 10px; border-radius:10px;
+    background:linear-gradient(#fff,#fff);
+    border:1px solid #eef2f6;
+    min-height:42px;
+  }
+  .score-item .badge{
+    font-size:12px; font-weight:800; padding:4px 8px; border-radius:999px;
+    background:#0f172a; color:#fff; letter-spacing:.02em;
+  }
+  .score-item .label{font-weight:800; font-size:14px; white-space:nowrap; overflow:hidden; text-overflow:ellipsis;}
+  .score-item .hint{font-size:12px; color:#111; opacity:.8;}
+  .score-item.active{border-color:#bfe5f9; box-shadow:0 0 0 3px rgba(36,170,237,.14);}
   .score-item.active .badge{background:var(--accent);}
   .score-item.dim{opacity:.6}
   .score-item.idle{opacity:.45}
-  .result-text{display:flex;flex-direction:column;min-height:140px;}
-  .crit-space{min-height:24px;display:flex;align-items:center;}
-  .crit{margin:0;font-weight:900;font-size:clamp(16px,3.2vw,20px)}
-  .big{margin:6px 0 0;font-weight:900;font-size:clamp(20px,3.6vw,26px)}
-  .comment{margin:6px 0 0;font-size:clamp(13px,2.4vw,15px);line-height:1.8}
+
+  /* 結果テキスト（高さ予約でブレ防止） */
+  .result-text{
+    display:flex; flex-direction:column;
+    min-height: 140px; /* ここで固定領域確保 */
+  }
+  .crit-space{min-height:24px; display:flex; align-items:center;}
+  .crit{margin:0; font-weight:900; font-size:clamp(16px,3.2vw,20px)}
+  .big{margin:6px 0 0; font-weight:900; font-size:clamp(20px,3.6vw,26px)}
+  .comment{margin:6px 0 0; font-size:clamp(13px,2.4vw,15px); line-height:1.8}
+
   .spacer{flex:1}
-  .actions{display:flex;gap:10px;flex-wrap:wrap;justify-content:flex-start;position:relative;z-index:2;margin-top:6px;}
+
+  /* ボタン（枠内・余白短め・サイズは従来通り） */
+  .actions{
+    display:flex; gap:10px; flex-wrap:wrap; justify-content:flex-start;
+    position:relative; z-index:2; margin-top:6px;
+  }
   .btn{border:none;cursor:pointer;font-weight:800;display:inline-flex;align-items:center;gap:12px}
-  .btn.primary{background:var(--btn-bg);color:var(--btn-ink);padding:10px 44px;border-radius:999px;font-size:clamp(14px,2.8vw,18px);line-height:1;min-height:var(--btn-h);min-width:220px;white-space:nowrap;}
+  .btn.primary{
+    background:var(--btn-bg); color:var(--btn-ink);
+    padding:10px 44px; border-radius:999px;
+    font-size:clamp(14px,2.8vw,18px); line-height:1;
+    min-height:var(--btn-h); min-width:220px; white-space:nowrap;
+  }
   .btn.primary::before{content:"";width:10px;height:10px;border-radius:50%;background:var(--btn-ink);display:inline-block}
+
+  /* ======== モバイル専用最適化（PC/タブレットには影響しません） ======== */
   @media (max-width:480px){
-    :root{--panel-h:240px;--btn-h:46px;}
-    .wrap{padding:14px}.card{padding:14px}.stage{padding:14px;gap:12px}
-    .result::before{display:none;}
-    .die{width:min(40vw,140px);height:min(40vw,140px);}
+    :root{
+      --panel-h: 240px;   /* パネル高さを縮める */
+      --btn-h: 46px;      /* ボタンを少し厚く */
+    }
+
+    .wrap{padding:14px}
+    .card{padding:14px}
+    .stage{padding:14px; gap:12px}
+
+    /* スコア表上の青ラインを消す */
+    .result::before { display:none; }
+
+    .dice-area{padding:12px}
+    .die{ width:min(40vw,140px); height:min(40vw,140px); } /* ダイスを少し小さく */
+    .die-num{font-size:clamp(28px,10vw,48px)}
+
+    .score-card{padding:10px}
+    .score-title{font-size:11px; letter-spacing:.16em; margin-bottom:6px}
+    .score-list{gap:6px}
+    .score-item{min-height:38px; padding:7px 8px; gap:8px}
+    .score-item .badge{font-size:11px; padding:3px 7px}
+    .score-item .label{font-size:13px}
+    .score-item .hint{font-size:11px}
+
     .result{padding:12px 12px calc(10px + var(--btn-h)) 12px}
-    .actions{margin-top:4px;justify-content:center;}
-    .btn.primary{min-width:auto;width:88%;justify-content:center;padding:14px 20px;font-size:16px;}
+    .result-text{min-height:128px}
+    .crit-space{min-height:22px}
+    .crit{font-size:16px}
+    .big{font-size:20px}
+    .comment{font-size:13px; line-height:1.7}
+
+    .actions{margin-top:4px; justify-content:center;}
+    .btn.primary{
+      min-width:auto;         /* 端末幅にフィット */
+      width:88%;              /* 横幅を少し短く */
+      justify-content:center;
+      padding:14px 20px;
+      font-size:16px;
+    }
   }
 </style>
 </head>
 <body>
-<div class="wrap"><div class="card"><div class="stage">
-  <div class="dice-area">
-    <div class="dice-grid">
-      <div class="die-wrap"><div class="die" id="dieA"></div><div class="die-num" id="numA"></div></div>
-      <div class="die-wrap"><div class="die" id="dieB"></div><div class="die-num" id="numB"></div></div>
+  <div class="wrap">
+    <div class="card">
+      <div class="stage">
+        <!-- 左：ダイス -->
+        <div class="dice-area">
+          <div class="dice-grid">
+            <div class="die-wrap"><div class="die" id="dieA" aria-hidden="true"></div><div class="die-num" id="numA" aria-live="polite"></div></div>
+            <div class="die-wrap"><div class="die" id="dieB" aria-hidden="true"></div><div class="die-num" id="numB" aria-live="polite"></div></div>
+          </div>
+        </div>
+
+        <!-- 右：SCORE CARD + 結果 -->
+        <div class="result">
+          <!-- SCORE CARD -->
+          <div class="score-card" id="scoreCard">
+            <p class="score-title">SCORE CARD</p>
+            <ul class="score-list">
+              <li class="score-item" id="rowSuper">
+                <span class="badge">★★</span>
+                <span class="label">スーパークリティカル</span>
+                <span class="hint">★★★</span>
+              </li>
+              <li class="score-item" id="rowPct">
+                <span class="badge">高 01〜99 低</span>
+                <span class="label" id="pctLabel">ダイス値：—</span>
+                <span class="hint">★★☆</span>
+              </li>
+              <li class="score-item" id="rowFumble">
+                <span class="badge">00</span>
+                <span class="label">ファンブル</span>
+                <span class="hint">★☆☆</span>
+              </li>
+            </ul>
+          </div>
+
+          <!-- 結果テキスト（高さ予約） -->
+          <div class="result-text">
+            <div class="crit-space">
+              <p class="crit" id="critBanner" style="visibility:hidden;">&nbsp;</p>
+            </div>
+            <p class="big" id="fortuneLabel">今日の運勢：—</p>
+            <p class="comment" id="fortuneComment"></p>
+          </div>
+
+          <div class="spacer"></div>
+
+          <div class="actions">
+            <button class="btn primary" id="rollBtn">ダイスを振る</button>
+          </div>
+        </div>
+      </div>
     </div>
   </div>
-  <div class="result">
-    <div class="score-card" id="scoreCard">
-      <p class="score-title">SCORE CARD</p>
-      <ul class="score-list">
-        <li class="score-item" id="rowSuper"><span class="badge">★★</span><span class="label">スーパークリティカル</span><span class="hint">★★★</span></li>
-        <li class="score-item" id="rowPct"><span class="badge">％</span><span class="label" id="pctLabel">パーセンタイル（高 01〜99 低）</span><span class="hint">★★☆</span></li>
-        <li class="score-item" id="rowFumble"><span class="badge">00</span><span class="label">100（00）＝ファンブル</span><span class="hint">★☆☆</span></li>
-      </ul>
-    </div>
-    <div class="result-text">
-      <div class="crit-space"><p class="crit" id="critBanner" style="visibility:hidden;">&nbsp;</p></div>
-      <p class="big" id="fortuneLabel">今日の運勢：—</p>
-      <p class="comment" id="fortuneComment"></p>
-    </div>
-    <div class="spacer"></div>
-    <div class="actions"><button class="btn primary" id="rollBtn">ダイスを振る</button></div>
-  </div>
-</div></div></div>
+
+  <audio id="sfx" src="sound/dice.mp3" preload="auto"></audio>
 
 <script>
-const dieA=document.getElementById('dieA'),dieB=document.getElementById('dieB');
-const numA=document.getElementById('numA'),numB=document.getElementById('numB');
-const fortuneLabel=document.getElementById('fortuneLabel'),fortuneComment=document.getElementById('fortuneComment');
-const critBanner=document.getElementById('critBanner'),rollBtn=document.getElementById('rollBtn');
-const rowSuper=document.getElementById('rowSuper'),rowPct=document.getElementById('rowPct'),rowFumble=document.getElementById('rowFumble');
-const pctLabel=document.getElementById('pctLabel');
-let endTimer=null;
+  /* ===== ダイスPNG（元のまま） ===== */
+  const diceImages = { A:'img/d20_a.png', B:'img/d20_b.png' };
 
-const fortunes={
-  "超大吉":["今日はすべてが味方です。肩の力を抜いて、そのまま進みましょう。","がんばってきたことが、静かに花ひらく日。自分を信じて大丈夫。"],
-  "大吉":["いい風が吹いています。素直な一歩が、思わぬ実りに。","あなたの魅力が伝わる日。やさしい言葉から始めてみて。"],
-  "中吉":["静かな追い風。焦らず、できることから積み重ねましょう。","あなたらしいやり方で大丈夫。落ち着いて、ゆっくりと。"],
-  "小吉":["今日は“整える”が吉。休むことも立派な前進です。","やさしい気配りが、思いのほか伝わっていきますよ。"],
-  "吉":["無理をしなくても、ちゃんと前に進めていますよ。","丁寧に選んだ行動が、やがて確かな実感に。"],
-  "末吉":["慎重さが味方。今日は深呼吸を多めに。","無理に広げず、今あるものを丁寧に。"],
-  "凶":["うまくいかない時は、少しだけ歩みをゆるめましょう。","あたたかい飲み物で一息。明日に期待で大丈夫。"],
-  "大凶":["立ち止まる勇気が、あなたを守ってくれます。","いまは温めるとき。整えてからで間に合います。"]
-};
+  // 要素
+  const dieA = document.getElementById('dieA');
+  const dieB = document.getElementById('dieB');
+  const numA = document.getElementById('numA');
+  const numB = document.getElementById('numB');
+  const fortuneLabel = document.getElementById('fortuneLabel');
+  const fortuneComment = document.getElementById('fortuneComment');
+  const critBanner = document.getElementById('critBanner');
+  const rollBtn = document.getElementById('rollBtn');
 
-function fortuneFromOutcome(result){
-  if(result==='★★')return['超大吉','超大吉','super'];
-  if(result>=1&&result<=5)return['大吉','大吉',null];
-  if(result>=6&&result<=19)return['中吉','中吉',null];
-  if(result>=20&&result<=49)return['小吉','小吉',null];
-  if(result>=50&&result<=79)return['吉','吉',null];
-  if(result>=80&&result<=94)return['末吉','末吉',null];
-  if(result>=95&&result<=99)return['凶','凶',null];
-  if(result===100)return['大凶','大凶','fumble'];
-  return['吉','吉',null];
-}
+  // SCORE CARD
+  const rowSuper = document.getElementById('rowSuper');
+  const rowPct   = document.getElementById('rowPct');
+  const rowFumble= document.getElementById('rowFumble');
+  const pctLabel = document.getElementById('pctLabel');
 
-// 101通り（00〜99＋★★）を等確率で抽選
-function drawOutcome(){
-  const k=Math.floor(Math.random()*101);
-  return(k===100)?'★★':(k===0?100:k); // 0→100, 100→★★
-}
+  // 画像プリロード＆適用（表示欠けの原因対策で明示）
+  [diceImages.A, diceImages.B].forEach(src=>{ const i=new Image(); i.src=src; });
+  dieA.style.backgroundImage=`url(${diceImages.A})`;
+  dieB.style.backgroundImage=`url(${diceImages.B})`;
 
-// 表示用：★★ or 数値→十/一桁
-function facesFromOutcome(out){
-  if(out==='★★')return['★','★'];
-  const num=(out===100)?0:out;
-  const t=Math.floor(num/10),o=num%10;
-  return[String(t),String(o)];
-}
+  let endTimer=null;
 
-function setScoreIdle(){
-  [rowSuper,rowPct,rowFumble].forEach(el=>{el.classList.remove('active','dim');el.classList.add('idle');});
-  pctLabel.textContent='パーセンタイル（高 01〜99 低）';
-}
-function updateScoreCard(result){
-  [rowSuper,rowPct,rowFumble].forEach(el=>el.classList.remove('idle','active','dim'));
-  if(result==='★★'){rowSuper.classList.add('active');rowPct.classList.add('dim');rowFumble.classList.add('dim');}
-  else if(result===100){rowFumble.classList.add('active');rowSuper.classList.add('dim');rowPct.classList.add('dim');}
-  else{rowPct.classList.add('active');rowSuper.classList.add('dim');rowFumble.classList.add('dim');
-       const s=String(result).padStart(2,'0');
-       pctLabel.textContent=`パーセンタイル（現在 ${s} ／ 高 01〜99 低）`;}
-}
-function clearNumbers(){numA.textContent='';numB.textContent='';numA.classList.remove('show');numB.classList.remove('show');}
-function showCriticalBanner(kind){
-  if(kind==='super'){critBanner.innerHTML='✦ <strong>スーパークリティカル！！</strong> ✦';critBanner.style.visibility='visible';}
-  else if(kind==='fumble'){critBanner.innerHTML='✦ <strong>ファンブル…</strong> ✦';critBanner.style.visibility='visible';}
-  else{critBanner.style.visibility='hidden';critBanner.innerHTML='';}
-}
+  // やさしい女性トーンのコメント
+  const fortunes = {
+    "超大吉": ["今日はすべてが味方です。肩の力を抜いて、そのまま進みましょう。","がんばってきたことが、静かに花ひらく日。自分を信じて大丈夫。"],
+    "大吉":   ["いい風が吹いています。素直な一歩が、思わぬ実りに。","あなたの魅力が伝わる日。やさしい言葉から始めてみて。"],
+    "中吉":   ["静かな追い風。焦らず、できることから積み重ねましょう。","あなたらしいやり方で大丈夫。落ち着いて、ゆっくりと。"],
+    "小吉":   ["今日は“整える”が吉。休むことも立派な前進です。","やさしい気配りが、思いのほか伝わっていきますよ。"],
+    "吉":     ["無理をしなくても、ちゃんと前に進めていますよ。","丁寧に選んだ行動が、やがて確かな実感に。"],
+    "末吉":   ["慎重さが味方。今日は深呼吸を多めに。","無理に広げず、今あるものを丁寧に。"],
+    "凶":     ["うまくいかない時は、少しだけ歩みをゆるめましょう。","あたたかい飲み物で一息。明日に期待で大丈夫。"],
+    "大凶":   ["立ち止まる勇気が、あなたを守ってくれます。","いまは温めるとき。整えてからで間に合います。"]
+  };
 
-function roll(){
-  if(endTimer){clearTimeout(endTimer);endTimer=null;}
-  [dieA,dieB].forEach(d=>{d.classList.remove('tilt-a','tilt-b','spin');void d.offsetWidth;d.classList.add('spin');});
-  clearNumbers();showCriticalBanner(null);
-  fortuneLabel.textContent='今日の運勢：—';fortuneComment.textContent='';setScoreIdle();
+  /* ===== 運勢レンジ =====
+     ★★：超大吉
+     01–05：大吉
+     06–19：中吉
+     20–49：小吉
+     50–79：吉
+     80–94：末吉
+     95–99：凶
+     100（00）：大凶（ファンブル）
+  */
+  function fortuneFromOutcome(result){ // result: '★★' or 1..100
+    if (result === '★★') return ['超大吉','超大吉','super'];
+    if (result >= 1  && result <= 5)   return ['大吉','大吉',null];
+    if (result >= 6  && result <= 19)  return ['中吉','中吉',null];
+    if (result >= 20 && result <= 49)  return ['小吉','小吉',null];
+    if (result >= 50 && result <= 79)  return ['吉','吉',null];
+    if (result >= 80 && result <= 94)  return ['末吉','末吉',null];
+    if (result >= 95 && result <= 99)  return ['凶','凶',null];
+    if (result === 100)                return ['大凶','大凶','fumble'];
+    return ['吉','吉',null];
+  }
 
-  const ROLL_MS=2000;
-  endTimer=setTimeout(()=>{
-    [dieA,dieB].forEach(d=>d.classList.remove('spin'));
-    setTimeout(()=>{dieA.classList.add('tilt-a');dieB.classList.add('tilt-b');},40);
-    const result=drawOutcome();
-    const [display,tier,critKind]=fortuneFromOutcome(result);
-    const [fa,fb]=facesFromOutcome(result);
-    showCriticalBanner(critKind);
-    fortuneLabel.textContent=`今日の運勢：${display}`;
-    const pool=fortunes[tier]||[];
-    fortuneComment.textContent=pool.length?pool[Math.floor(Math.random()*pool.length)]:'';
-    updateScoreCard(result);
-    setTimeout(()=>{numA.textContent=fa;numA.classList.add('show');numB.textContent=fb;numB.classList.add('show');},140);
-    endTimer=null;
-  },ROLL_MS);
-}
+  // 101通り（00〜99＋★★）を等確率で抽選
+  function drawOutcome(){
+    const k = Math.floor(Math.random()*101);   // 0..100
+    return (k===100) ? '★★' : (k===0 ? 100 : k); // 0→100(=00), 100→★★, 1..99→そのまま
+  }
 
-rollBtn.addEventListener('click',roll);
-setScoreIdle();
+  // 表示用の二桁（★★は★/★、100は0/0、他は00〜99を分解）
+  function facesFromOutcome(out){
+    if (out === '★★') return ['★','★'];
+    const num = (out===100) ? 0 : out; // 100は00表示
+    const t = Math.floor(num/10), o = num % 10;
+    return [String(t), String(o)];
+  }
+
+  /* ---- SCORE CARD ---- */
+  function setScoreIdle(){
+    [rowSuper,rowPct,rowFumble].forEach(el=>{
+      el.classList.remove('active','dim');
+      el.classList.add('idle');
+    });
+    pctLabel.textContent = 'ダイス値：—';
+  }
+
+  function updateScoreCard(result){
+    [rowSuper,rowPct,rowFumble].forEach(el=>el.classList.remove('idle','active','dim'));
+    if (result === '★★'){
+      rowSuper.classList.add('active');
+      rowPct.classList.add('dim'); rowFumble.classList.add('dim');
+      pctLabel.textContent = 'ダイス値：★★';
+    } else if (result === 100){
+      rowFumble.classList.add('active');
+      rowSuper.classList.add('dim'); rowPct.classList.add('dim');
+      pctLabel.textContent = 'ダイス値：00';
+    } else {
+      rowPct.classList.add('active');
+      rowSuper.classList.add('dim'); rowFumble.classList.add('dim');
+      pctLabel.textContent = `ダイス値：${String(result).padStart(2,'0')}`;
+    }
+  }
+
+  function clearNumbers(){
+    numA.classList.remove('show'); numB.classList.remove('show');
+    numA.textContent=''; numB.textContent='';
+  }
+
+  function showCriticalBanner(kind){
+    if (kind==='super'){
+      critBanner.innerHTML = `✦ <strong>スーパークリティカル！！</strong> ✦`;
+      critBanner.style.visibility='visible';
+    } else if (kind==='fumble'){
+      critBanner.innerHTML = `✦ <strong>ファンブル…</strong> ✦`;
+      critBanner.style.visibility='visible';
+    } else {
+      critBanner.style.visibility='hidden';
+      critBanner.innerHTML = '';
+    }
+  }
+
+  function roll(){
+    if (endTimer){ clearTimeout(endTimer); endTimer=null; }
+
+    [dieA,dieB].forEach(d=>{ d.classList.remove('tilt-a','tilt-b','spin'); void d.offsetWidth; d.classList.add('spin'); });
+    clearNumbers();
+    showCriticalBanner(null);
+    fortuneLabel.textContent='今日の運勢：—';
+    fortuneComment.textContent='';
+    setScoreIdle();
+
+    const ROLL_MS=2000;
+    endTimer=setTimeout(()=>{
+      [dieA,dieB].forEach(d=>d.classList.remove('spin'));
+      setTimeout(()=>{ dieA.classList.add('tilt-a'); dieB.classList.add('tilt-b'); },40);
+
+      const result = drawOutcome(); // '★★' or 1..100
+      const [display,tier,critKind] = fortuneFromOutcome(result);
+      const [fa, fb] = facesFromOutcome(result);
+
+      showCriticalBanner(critKind);
+      fortuneLabel.textContent=`今日の運勢：${display}`;
+      const pool = fortunes[tier] || [];
+      fortuneComment.textContent = pool.length ? pool[Math.floor(Math.random()*pool.length)] : '';
+
+      updateScoreCard(result);
+
+      setTimeout(()=>{ numA.textContent=fa; numA.classList.add('show'); numB.textContent=fb; numB.classList.add('show'); },140);
+
+      endTimer=null;
+    },ROLL_MS);
+  }
+
+  // 初期はSCORE CARDをグレーに
+  setScoreIdle();
+  rollBtn.addEventListener('click', roll);
 </script>
 </body>
 </html>
+
 
 
 
